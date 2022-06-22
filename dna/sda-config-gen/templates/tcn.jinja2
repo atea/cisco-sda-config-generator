@@ -6,11 +6,11 @@ hostname {{ local_config.hostname }}
 ip domain name {{ config.global.domain }}
 snmp-server location {{ local_config.snmp_location }}
 
-! Linknet to PE1
-interface {{ local_config.interfaces.pe1.port }}
- description lnk:{{ config.pe.pe1.hostname }}:{{ config.pe.pe1.interfaces[local].port }}
+! Linknet to FUSION1
+interface {{ local_config.interfaces.fusion1.port }}
+ description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
  no switchport
- ip address {{ config.pe.pe1.interfaces[local].linknet | last_ip }} {{ config.pe.pe1.interfaces[local].linknet | netmask }}
+ ip address {{ config.fusion.fusion1.interfaces[local].linknet | last_ip }} {{ config.fusion.fusion1.interfaces[local].linknet | netmask }}
  no shutdown
  no ip redirects
  bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
@@ -19,11 +19,11 @@ interface {{ local_config.interfaces.pe1.port }}
  load-interval 30
 !
 
-! Linknet to PE2
-interface {{ local_config.interfaces.pe2.port }}
- description lnk:{{ config.pe.pe2.hostname }}:{{ config.pe.pe2.interfaces[local].port }}
+! Linknet to FUSION2
+interface {{ local_config.interfaces.fusion2.port }}
+ description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
  no switchport
- ip address {{ config.pe.pe2.interfaces[local].linknet | last_ip }} {{ config.pe.pe2.interfaces[local].linknet | netmask }}
+ ip address {{ config.fusion.fusion2.interfaces[local].linknet | last_ip }} {{ config.fusion.fusion2.interfaces[local].linknet | netmask }}
  no shutdown
  no ip redirects
  bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
@@ -60,21 +60,21 @@ router bgp {{ local_config.asn }}
  exit-peer-session
  !
  address-family ipv4
-  network {{ config.pe.pe1.interfaces[local].linknet | network }} mask {{ config.pe.pe1.interfaces[local].linknet | netmask }}
-  network {{ config.pe.pe2.interfaces[local].linknet | network }} mask {{ config.pe.pe2.interfaces[local].linknet | netmask }}
+  network {{ config.fusion.fusion1.interfaces[local].linknet | network }} mask {{ config.fusion.fusion1.interfaces[local].linknet | netmask }}
+  network {{ config.fusion.fusion2.interfaces[local].linknet | network }} mask {{ config.fusion.fusion2.interfaces[local].linknet | netmask }}
   network {{ local_config.ip }} mask 255.255.255.255
   !
-  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} remote-as {{ config.pe.asn }}
-  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
-  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} description "eBGP to PE1:{{ config.pe.pe1.hostname }}:{{ config.pe.pe1.interfaces[local].port }}:{{ config.pe.pe1.interfaces[local].vrf }}"
-  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.pe1.port }}
-  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} activate
+  neighbor {{ config.fusion.fusion1.interfaces[local].linknet | first_ip }} remote-as {{ config.fusion.asn }}
+  neighbor {{ config.fusion.fusion1.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
+  neighbor {{ config.fusion.fusion1.interfaces[local].linknet | first_ip }} description "eBGP to FUSION1:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}:{{ config.fusion.fusion1.interfaces[local].vrf }}"
+  neighbor {{ config.fusion.fusion1.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.fusion1.port }}
+  neighbor {{ config.fusion.fusion1.interfaces[local].linknet | first_ip }} activate
   !
-  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} remote-as {{ config.pe.asn }}
-  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
-  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} description "eBGP to PE2:{{ config.pe.pe2.hostname }}:{{ config.pe.pe2.interfaces[local].port }}:{{ config.pe.pe2.interfaces[local].vrf }}"
-  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.pe2.port }}
-  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} activate
+  neighbor {{ config.fusion.fusion2.interfaces[local].linknet | first_ip }} remote-as {{ config.fusion.asn }}
+  neighbor {{ config.fusion.fusion2.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
+  neighbor {{ config.fusion.fusion2.interfaces[local].linknet | first_ip }} description "eBGP to FUSION2:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}:{{ config.fusion.fusion2.interfaces[local].vrf }}"
+  neighbor {{ config.fusion.fusion2.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.fusion2.port }}
+  neighbor {{ config.fusion.fusion2.interfaces[local].linknet | first_ip }} activate
  exit-address-family
 !
 

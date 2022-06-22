@@ -33,10 +33,10 @@ env.filters['network'] = get_network
 env.filters['first_ip'] = get_first_ip
 env.filters['last_ip'] = get_last_ip
 
-# generate pe1 + pe2
-template = env.get_template('pe.jinja2')
-pe1 = template.render(config=config, local='pe1')
-pe2 = template.render(config=config, local='pe2')
+# generate fusion1 + fusion2
+template = env.get_template('fusion.jinja2')
+fusion1 = template.render(config=config, local='fusion1')
+fusion1 = template.render(config=config, local='fusion1')
 
 # generate tcn1 + tcn2
 template = env.get_template('tcn.jinja2')

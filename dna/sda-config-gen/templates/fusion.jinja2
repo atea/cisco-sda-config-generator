@@ -1,4 +1,4 @@
-{% set local_config = config['pe'][local] %}
+{% set local_config = config['fusion'][local] %}
 
 ! Linknet to TCN1
 interface {{ local_config.interfaces.tcn1.port }}
@@ -68,10 +68,10 @@ interface {{ local_config.interfaces.fexit2.port }}.{{ local_config.interfaces.f
  load-interval 30
 !
 
-! Deny default route ingress to PE
+! Deny default route ingress to FUSION
 ip prefix-list deny-default-route seq 5 permit 0.0.0.0/0 ge 1
 !
-router bgp {{ config.pe.asn }}
+router bgp {{ config.fusion.asn }}
  !
  template peer-session BGP-SDA
   password {{ config.global.bgp.password }}
