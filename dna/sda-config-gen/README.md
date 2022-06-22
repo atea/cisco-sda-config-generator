@@ -38,3 +38,21 @@ The following is assumed;
                                                               |_______________|
 
 ```
+
+# Setup
+ * Clone this repo
+ * Optional: initialize virtual environment
+ * Install requirements
+ * Copy `config.yml.dist` to `config.yml` and update with desired values
+ * Run script
+ * Profit???
+
+```
+git clone https://github.com/ateanorge/cisco.git
+cd cisco/dna/sda-config-gen
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp config.yml.dist config.yml
+python config-gen.py
+```
