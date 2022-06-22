@@ -4,15 +4,16 @@ This script aims to assist creating baseline configuration for a new SDA setup.
 It will generate configuration files for the following nodes;
 
  * PE1 and PE2 ("fusion")
- * TCN1 and TCN2 (two Transport Control Node)
- * FEXIT1 and FEXIT2 (two-node fabric site to provide default way out of fabrics)
+ * TCN1 and TCN2 (two Transit Control Plane nodes)
+ * FEXIT1 and FEXIT2 (two-node fabric site to provide default way out of all other fabrics)
  * FS1 and FS2 (first fabric site connected to FEXIT1 and FEXIT2 via SD-transit)
 
 The following is assumed;
 
- * Assumes LISP PubSub
+ * Assumes LISP PubSub (we run BGP as only routing protocol on TCN with our own ASN)
  * eBGP is used between each layer (i.e. between FS1 and FEXIT, between FEXIT and PE, and between PE and each TCN)
  * TCN nodes are connected directly to PE
+ * ISIS between FEXIT1+2 (to distribute Lo0 for the automatically configured iBGP to avoid multihop via FS or PE)
 
 ```
      _______________              _______________              _______________              _______________
