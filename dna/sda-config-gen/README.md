@@ -10,6 +10,7 @@ It will generate configuration files for the following nodes;
 
 The following is assumed;
 
+ * All nodes except PE is assumed to be "blank", hence minimal "global" config on PE (we assume they are in production)
  * Assumes LISP PubSub (we run BGP as only routing protocol on TCN with our own ASN)
  * eBGP is used between each layer (i.e. between FS1 and FEXIT, between FEXIT and PE, and between PE and each TCN)
  * TCN nodes are connected directly to PE
