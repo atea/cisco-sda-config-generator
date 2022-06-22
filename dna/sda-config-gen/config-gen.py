@@ -12,6 +12,9 @@ def yaml_from_file(file):
 def get_netmask(network):
   return ipaddress.ip_network(network).netmask
 
+def get_network(network):
+  return ipaddress.ip_network(network).network_address
+
 def get_first_ip(network):
   return list(ipaddress.ip_network(network).hosts())[0]
 
@@ -26,14 +29,13 @@ config = yaml_from_file(config_file)
 file_loader = FileSystemLoader('templates')
 env = Environment(loader=file_loader)
 env.filters['netmask'] = get_netmask
+env.filters['network'] = get_network
 env.filters['first_ip'] = get_first_ip
 env.filters['last_ip'] = get_last_ip
 
-# generate pe1
+# generate pe1 + pe2
 template = env.get_template('pe.jinja2')
-output = template.render(
-  config=config,
-  local='pe1'
-)
+pe1 = template.render(config=config, local='pe1')
+pe2 = template.render(config=config, local='pe2')
 
-print(output)
+print(pe1)
