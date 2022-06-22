@@ -1,0 +1,129 @@
+{% set local_config = config['pe'][local] %}
+
+! Linknet to TCN1
+interface {{ local_config.interfaces.tcn1.port }}
+ description lnk:{{ config.tcn.tcn1.hostname }}:{{ config.tcn.tcn1.interfaces[local].port }}
+ no switchport
+ vrf forwarding {{ local_config.interfaces.tcn1.vrf }}
+ ip address {{ local_config.interfaces.tcn1.linknet | first_ip }} {{ local_config.interfaces.tcn1.linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Linknet to TCN2
+interface {{ local_config.interfaces.tcn2.port }}
+ description lnk:{{ config.tcn.tcn2.hostname }}:{{ config.tcn.tcn2.interfaces[local].port }}
+ no switchport
+ vrf forwarding {{ local_config.interfaces.tcn2.vrf }}
+ ip address {{ local_config.interfaces.tcn2.linknet | first_ip }} {{ local_config.interfaces.tcn2.linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Manual underlay to FEXIT1
+interface {{ local_config.interfaces.fexit1.port }}
+ description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}
+ no switchport
+ no shutdown
+ load-interval 30
+!
+interface {{ local_config.interfaces.fexit1.port }}.{{ local_config.interfaces.fexit1.tag }}
+ description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit1.tag }}:GRT
+ encapsulation dot1q {{ local_config.interfaces.fexit1.tag }}
+ vrf forwarding {{ local_config.interfaces.fexit1.vrf }}
+ ip address {{ local_config.interfaces.fexit1.linknet | first_ip }} {{ local_config.interfaces.fexit1.linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Manual underlay to FEXIT2
+interface {{ local_config.interfaces.fexit2.port }}
+ description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}
+ no switchport
+ no shutdown
+ load-interval 30
+!
+interface {{ local_config.interfaces.fexit2.port }}.{{ local_config.interfaces.fexit2.tag }}
+ description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit2.tag }}:GRT
+ encapsulation dot1q {{ local_config.interfaces.fexit2.tag }}
+ vrf forwarding {{ local_config.interfaces.fexit2.vrf }}
+ ip address {{ local_config.interfaces.fexit2.linknet | first_ip }} {{ local_config.interfaces.fexit2.linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Deny default route ingress to PE
+ip prefix-list deny-default-route seq 5 permit 0.0.0.0/0 ge 1
+!
+router bgp {{ config.pe.asn }}
+ !
+ template peer-session BGP-SDA
+  password {{ config.global.bgp.password }}
+  timers {{ config.global.bgp.timers.keepalive }} {{ config.global.bgp.timers.holdtime }}
+  fall-over bfd
+ exit-peer-session
+ !
+ address-family ipv4 vrf {{ local_config.interfaces.tcn1.vrf }}
+  !
+  network {{ local_config.interfaces.tcn1.linknet | network }} mask {{ local_config.interfaces.tcn1.linknet | netmask }}
+  !
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} remote-as {{ config.tcn.tcn1.asn }}
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} inherit peer-session BGP-SDA
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} description "eBGP to TCN1:lnk:{{ config.tcn.tcn1.hostname }}:{{ config.tcn.tcn1.interfaces[local].port }}:GRT"
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} update-source {{ local_config.interfaces.tcn1.port }}
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} prefix-list deny-default-route in
+  neighbor {{ local_config.interfaces.tcn1.linknet | last_ip }} activate
+ exit-address-family
+ !
+ address-family ipv4 vrf {{ local_config.interfaces.tcn2.vrf }}
+  !
+  network {{ local_config.interfaces.tcn2.linknet | network }} mask {{ local_config.interfaces.tcn2.linknet | netmask }}
+  !
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} remote-as {{ config.tcn.tcn2.asn }}
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} inherit peer-session BGP-SDA
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} description "eBGP to TCN2:lnk:{{ config.tcn.tcn2.hostname }}:{{ config.tcn.tcn2.interfaces[local].port }}:GRT"
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} update-source {{ local_config.interfaces.tcn2.port }}
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} prefix-list deny-default-route in
+  neighbor {{ local_config.interfaces.tcn2.linknet | last_ip }} activate
+ exit-address-family
+ !
+ address-family ipv4 vrf {{ local_config.interfaces.fexit1.vrf }}
+  !
+  network {{ local_config.interfaces.fexit1.linknet | network }} mask {{ local_config.interfaces.fexit1.linknet | netmask }}
+  !
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} remote-as {{ config.fexit.fexit1.asn }}
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} inherit peer-session BGP-SDA
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} description "eBGP to FEXIT1:lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}:GRT"
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} update-source {{ local_config.interfaces.fexit1.port }}
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} prefix-list deny-default-route in
+  neighbor {{ local_config.interfaces.fexit1.linknet | last_ip }} activate
+ exit-address-family
+ !
+ address-family ipv4 vrf {{ local_config.interfaces.fexit2.vrf }}
+  !
+  network {{ local_config.interfaces.fexit2.linknet | network }} mask {{ local_config.interfaces.fexit2.linknet | netmask }}
+  !
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} remote-as {{ config.fexit.fexit2.asn }}
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} inherit peer-session BGP-SDA
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} description "eBGP to FEXIT2:lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}:GRT"
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} update-source {{ local_config.interfaces.fexit2.port }}
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} prefix-list deny-default-route in
+  neighbor {{ local_config.interfaces.fexit2.linknet | last_ip }} activate
+ exit-address-family
+!
