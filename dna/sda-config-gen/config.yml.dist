@@ -1,0 +1,143 @@
+global:
+  domain: foobar.com
+  enable_secret: supersecret
+  users:
+    admin: zeeeecret
+  snmp:
+    user: snmp_user
+    auth: 01234
+    priv: 56789
+  bfd:
+    interval: 100
+    min_rx: 100
+    multiplier: 3
+  bgp:
+    password: bgp-iz-cool
+    timers:
+      keepalive: 10
+      holdtime: 30
+
+fusion:
+  asn: 65000
+  fusion1:
+    hostname: fusion1
+    interfaces:
+      fexit1:
+        port: Fo1/0/1
+        tag: 200
+        vrf: mgmt_vrf
+        linknet: 10.10.11.0/31
+      fexit2:
+        port: Fo1/0/2
+        tag: 200
+        vrf: mgmt_vrf
+        linknet: 10.10.12.0/31
+      tcn1:
+        port: Fo1/0/3
+        vrf: mgmt_vrf
+        linknet: 10.10.13.0/31
+      tcn2:
+        port: Fo1/0/4
+        vrf: mgmt_vrf
+        linknet: 10.10.14.0/31
+  fusion2:
+    hostname: fusion2
+    interfaces:
+      fexit1:
+        port: Fo1/0/1
+        tag: 300
+        linknet: 10.11.11.0/31
+      fexit2:
+        port: Fo1/0/2
+        tag: 300
+        linknet: 10.11.12.0/31
+      tcn1:
+        port: Fo1/0/3
+        linknet: 10.11.13.0/31
+      tcn2:
+        port: Fo1/0/4
+        linknet: 10.11.14.0/31
+
+tcn:
+  tcn1:
+    hostname: tcn1
+    snmp_location: 'secret lair #1'
+    ip: 10.12.12.0
+    asn: 65001
+    interfaces:
+      fusion1:
+        port: Fo1/1/1
+      fusion2:
+        port: Fo1/1/2
+  tcn2:
+    hostname: tcn2
+    snmp_location: 'secret lair #2'
+    ip: 10.13.13.0
+    asn: 65002
+    interfaces:
+      fusion1:
+        port: Fo1/1/1
+      fusion2:
+        port: Fo1/1/2
+
+fexit:
+  asn: 65003
+  fexit1:
+    hostname: fexit1
+    ip: 10.13.13.0
+    interfaces:
+      fusion1:
+        port: Fo1/0/1
+      fusion2:
+        port: Fo1/0/2
+      fexit: &fexit
+        port: Fo1/0/3
+        linknet: 10.13.1.0/31
+      fs1:
+        port: Fo1/0/4
+        linknet: 10.13.2.0/31
+      fs2:
+        port: Fo1/0/5
+        linknet: 10.13.3.0/31
+  fexit2:
+    hostname: fexit2
+    ip: 10.14.14.0
+    interfaces:
+      fusion1:
+        port: Fo1/0/1
+      fusion2:
+        port: Fo1/0/2
+      fexit:
+        <<: *fexit
+        port: Fo1/0/3
+      fs1:
+        port: Fo1/0/4
+        linknet: 10.14.1.0/31
+      fs2:
+        port: Fo1/0/5
+        linknet: 10.14.2.0/31
+
+fs:
+  asn: 65004
+  fs1:
+    hostname: fs1
+    ip: 10.15.15.0
+    interfaces:
+      fexit1:
+        port: Fo1/0/1
+      fexit2:
+        port: Fo2/0/1
+      fs: &fs
+        port: Fo1/0/2
+        linknet: 10.15.1.0/31
+  fs2:
+    hostname: fs2
+    ip: 10.16.16.0
+    interfaces:
+      fexit1:
+        port: Fo1/0/1
+      fexit2:
+        port: Fo2/0/1
+      fs:
+        <<: *fs
+        port: Fo1/0/2
