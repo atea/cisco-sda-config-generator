@@ -38,4 +38,9 @@ template = env.get_template('pe.jinja2')
 pe1 = template.render(config=config, local='pe1')
 pe2 = template.render(config=config, local='pe2')
 
-print(pe1)
+# generate tcn1 + tcn2
+template = env.get_template('tcn.jinja2')
+tcn1 = template.render(config=config, local='tcn1')
+tcn2 = template.render(config=config, local='tcn2')
+
+print(tcn1)

@@ -1,0 +1,98 @@
+{% set local_config = config['tcn'][local] %}
+! SDA {{ local }}
+! {{ local_config.hostname }}
+
+hostname {{ local_config.hostname }}
+ip domain name {{ config.global.domain }}
+snmp-server location {{ local_config.snmp_location }}
+
+! Linknet to PE1
+interface {{ local_config.interfaces.pe1.port }}
+ description lnk:{{ config.pe.pe1.hostname }}:{{ config.pe.pe1.interfaces[local].port }}
+ no switchport
+ ip address {{ config.pe.pe1.interfaces[local].linknet | last_ip }} {{ config.pe.pe1.interfaces[local].linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Linknet to PE2
+interface {{ local_config.interfaces.pe2.port }}
+ description lnk:{{ config.pe.pe2.hostname }}:{{ config.pe.pe2.interfaces[local].port }}
+ no switchport
+ ip address {{ config.pe.pe2.interfaces[local].linknet | last_ip }} {{ config.pe.pe2.interfaces[local].linknet | netmask }}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+!
+
+! Loopback
+interface Lo0
+ ip address {{ local_config.ip }} 255.255.255.255
+ no shutdown
+ ip pim sparse-mode
+!
+
+!
+ip routing
+ip multicast-routing
+service password-encryption
+system mtu 9100
+!
+
+!
+router bgp {{ local_config.asn }}
+ bgp router-id interface Lo0
+ bgp log-neighbor-changes
+ bgp graceful-restart
+ no bgp default ipv4-unicast
+ !
+ template peer-session BGP-SDA
+  password {{ config.global.bgp.password }}
+  timers {{ config.global.bgp.timers.keepalive }} {{ config.global.bgp.timers.holdtime }}
+  fall-over bfd
+ exit-peer-session
+ !
+ address-family ipv4
+  network {{ config.pe.pe1.interfaces[local].linknet | network }} mask {{ config.pe.pe1.interfaces[local].linknet | netmask }}
+  network {{ config.pe.pe2.interfaces[local].linknet | network }} mask {{ config.pe.pe2.interfaces[local].linknet | netmask }}
+  network {{ local_config.ip }} mask 255.255.255.255
+  !
+  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} remote-as {{ config.pe.asn }}
+  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
+  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} description "eBGP to PE1:{{ config.pe.pe1.hostname }}:{{ config.pe.pe1.interfaces[local].port }}:{{ config.pe.pe1.interfaces[local].vrf }}"
+  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.pe1.port }}
+  neighbor {{ config.pe.pe1.interfaces[local].linknet | first_ip }} activate
+  !
+  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} remote-as {{ config.pe.asn }}
+  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} inherit peer-session BGP-SDA
+  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} description "eBGP to PE2:{{ config.pe.pe2.hostname }}:{{ config.pe.pe2.interfaces[local].port }}:{{ config.pe.pe2.interfaces[local].vrf }}"
+  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} update-source {{ local_config.interfaces.pe2.port }}
+  neighbor {{ config.pe.pe2.interfaces[local].linknet | first_ip }} activate
+ exit-address-family
+!
+
+!
+aaa new-model
+enable secret {{ config.global.enable_secret }}
+{%- for user in config.global.users %}
+username {{ user }} privilege 15 secret {{ config.global.users[user] }}
+{%- endfor %}
+!
+aaa authorization exec default local
+netconf-yang
+ip ssh ver 2
+crypto key gen rsa mod 2048
+!
+
+! basic snmp, rest pushed via template
+snmp-server view DNAC-ACCESS iso included
+snmp-server group DNACGROUPAuthPriv v3 priv read DNAC-ACCESS write DNAC-ACCESS
+snmp-server user {{ config.global.snmp.user }} DNACGROUPAuthPriv v3 auth sha {{ config.global.snmp.auth }} priv aes 128 {{ config.global.snmp.priv }}
+!
