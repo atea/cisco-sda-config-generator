@@ -39,7 +39,7 @@ The following is assumed;
 
 ```
 
-# Setup
+## Setup
  * Clone this repo
  * Optional: initialize virtual environment
  * Install requirements
