@@ -14,6 +14,7 @@ The following is assumed;
  * eBGP is used between each layer (i.e. between FS1 and FEXIT, between FEXIT and PE, and between PE and each TCN)
  * TCN nodes are connected directly to PE
 
+```
     _________________           _________________           _________________           _________________
     |               |___________|               |___________|               |___________|               |
     | FS1 #1 (B+CP) |___        | FEXIT1 (B+CP) |___        |  PE1 (MPLS)   |___        |      TCN1     |
@@ -24,3 +25,4 @@ The following is assumed;
     | FS1 #2 (B+CP) |___________| FEXIT2 (B+CP) |___________|  PE2 (MPLS)   |___________|      TCN2     |
     |_______________|           |_______________|           |_______________|           |_______________|
 
+```

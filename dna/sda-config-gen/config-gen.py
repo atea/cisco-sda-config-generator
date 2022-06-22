@@ -22,17 +22,7 @@ work_dir = os.path.dirname(os.path.realpath(__file__))
 config_file = work_dir + '/config.yml'
 config = yaml_from_file(config_file)
 
-
-#persons = [
-#    {'name': 'Andrej', 'age': 34}, 
-#    {'name': 'Mark', 'age': 17}, 
-#    {'name': 'Thomas', 'age': 44}, 
-#    {'name': 'Lucy', 'age': 14}, 
-#    {'name': 'Robert', 'age': 23}, 
-#    {'name': 'Dragomir', 'age': 54}
-#]
-#
-#
+# prepare templates & filters
 file_loader = FileSystemLoader('templates')
 env = Environment(loader=file_loader)
 env.filters['netmask'] = get_netmask
@@ -45,21 +35,5 @@ output = template.render(
   config=config,
   local='pe1'
 )
-#  
-#  pe=config['pe'])
+
 print(output)
-#
-## generate pe2
-#
-#
-#template = env.get_template('showpersons.txt')
-#
-#output = template.render(persons=persons)
-#print(output)
-#
-#name = input("Enter your name: ")
-#
-#tm = Template("Hello {{ name }}")
-#msg = tm.render(name=name)
-#
-#print(msg)
