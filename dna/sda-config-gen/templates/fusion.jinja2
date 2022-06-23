@@ -1,4 +1,6 @@
 {% set local_config = config['fusion'][local] %}
+! SDA {{ local }}
+! {{ local_config.hostname }}
 
 ! Linknet to TCN1
 interface {{ local_config.interfaces.tcn1.port }}

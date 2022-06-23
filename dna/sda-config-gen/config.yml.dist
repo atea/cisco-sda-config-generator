@@ -86,10 +86,14 @@ fexit:
     hostname: fexit1
     ip: 10.13.13.0
     interfaces:
-      fusion1:
+      fusion1: &fusion1
         port: Fo1/0/1
-      fusion2:
+        native: 999
+        allowed: 200-299
+      fusion2: &fusion2
         port: Fo1/0/2
+        native: 999
+        allowed: 300-399
       fexit: &fexit
         port: Fo1/0/3
         linknet: 10.13.1.0/31
@@ -104,8 +108,10 @@ fexit:
     ip: 10.14.14.0
     interfaces:
       fusion1:
+        <<: *fusion1
         port: Fo1/0/1
       fusion2:
+        <<: *fusion2
         port: Fo1/0/2
       fexit:
         <<: *fexit
