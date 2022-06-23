@@ -36,7 +36,7 @@ env.filters['last_ip'] = get_last_ip
 # generate fusion1 + fusion2
 template = env.get_template('fusion.jinja2')
 fusion1 = template.render(config=config, local='fusion1')
-fusion1 = template.render(config=config, local='fusion1')
+fusion2 = template.render(config=config, local='fusion2')
 
 # generate tcn1 + tcn2
 template = env.get_template('tcn.jinja2')
