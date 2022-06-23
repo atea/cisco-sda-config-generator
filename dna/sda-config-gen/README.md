@@ -11,12 +11,12 @@ It will generate configuration files for the following nodes;
 The following is assumed;
 
  * All nodes except FUSION is assumed to be "blank", hence minimal "global" config on FUSION (we assume they are in production)
- * "Bare minimum" to get the device discoverable and configurable from DNAC. Proper config pushed via dayN templates from DNAC.
  * Assumes LISP PubSub (we run BGP as only routing protocol on TCN with our own ASN, which would not work with LISP/BGP)
  * eBGP is used between each layer (i.e. between FS1 and FEXIT, between FEXIT and FUSION, and between FUSION and each TCN)
  * TCN nodes are connected directly to FUSION
  * ISIS between FEXIT1+2 (to distribute Lo0 for the automatically configured iBGP to avoid multihop via FS or FUSION)
-
+ * Device-specific config is properly configured (proper descriptions and similar), while common config only has bare minimum to get the device discoverable and configurable from DNAC. Full and best-practice config pushed via dayN templates from DNAC when provisioning (SNMP ACLs, VTY config, etc).
+ 
 ```
                                                                _______________ 
                                                               |               |
