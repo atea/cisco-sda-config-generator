@@ -1,0 +1,5 @@
+ template peer-session BGP-SDA
+  password {{ config.global.bgp_password }}
+  timers 10 30
+  fall-over bfd
+ exit-peer-session
