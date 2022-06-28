@@ -76,7 +76,7 @@ interface Lo0
 !
 {% include 'includes/common.j2' %}
 !
-router bgp {{ config.fexit[local].asn }}
+router bgp {{ config.fexit.asn }}
 {% include 'includes/bgp_common.j2' %}
  !
 {% include 'includes/bgp_template.j2' %}
