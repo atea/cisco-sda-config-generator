@@ -34,13 +34,23 @@ env.filters['first_ip'] = get_first_ip
 env.filters['last_ip'] = get_last_ip
 
 # generate fusion1 + fusion2
-template = env.get_template('fusion.jinja2')
+template = env.get_template('fusion.j2')
 fusion1 = template.render(config=config, local='fusion1')
 fusion2 = template.render(config=config, local='fusion2')
 
 # generate tcn1 + tcn2
-template = env.get_template('tcn.jinja2')
+template = env.get_template('tcn.j2')
 tcn1 = template.render(config=config, local='tcn1')
 tcn2 = template.render(config=config, local='tcn2')
 
-print(tcn1)
+# generate fexit1 + fexit2
+template = env.get_template('fexit.j2')
+fexit1 = template.render(config=config, local='fexit1', peer='fexit2')
+fexit2 = template.render(config=config, local='fexit2', peer='fexit1')
+
+#print(fusion1)
+#print(fusion2)
+#print(tcn1)
+#print(tcn2)
+#print(fexit1)
+print(fexit2)
