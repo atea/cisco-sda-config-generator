@@ -43,7 +43,7 @@ interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
 interface {{ local_config.interfaces.fexit.port }}
  description lnk:{{ config.fexit[peer].hostname }}:{{ config.fexit[peer].interfaces.fexit.port }}
  no switchport
- {%- if local.endswith('1') %}
+ {%- if local.endswith('1') or local.endswith('a') %}
  {{ macros.get_first_ip(local_config.interfaces.fexit.linknet) }}
  {%- else %}
  {{ macros.get_last_ip(local_config.interfaces.fexit.linknet) }}

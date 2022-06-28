@@ -27,7 +27,7 @@ interface {{ local_config.interfaces.fexit2.port }}
 interface {{ local_config.interfaces.fs.port }}
  description lnk:{{ config.fs[peer].hostname }}:{{ config.fs[peer].interfaces.fs.port }}
  no switchport
- {%- if local.endswith('a') %}
+ {%- if local.endswith('1') or local.endswith('a') %}
  {{ macros.get_first_ip(local_config.interfaces.fs.linknet) }}
  {%- else %}
  {{ macros.get_last_ip(local_config.interfaces.fs.linknet) }}
