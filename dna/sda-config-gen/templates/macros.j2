@@ -1,0 +1,47 @@
+{%- macro get_first_ip(ip_net) -%}
+ ip address {{ ip_net | first_ip }} {{ ip_net | netmask }}
+{%- endmacro -%}
+
+{%- macro get_last_ip(ip_net) -%}
+ ip address {{ ip_net | last_ip }} {{ ip_net | netmask }}
+{%- endmacro -%}
+
+{%- macro l3_interface_common(config) -%}
+ no shutdown
+ no ip redirects
+ bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
+ ip pim sparse-mode
+ ip pim bfd
+ load-interval 30
+{%- endmacro -%}
+
+{%- macro l2_interface_common(config) -%}
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ no shutdown
+ load-interval 30
+{%- endmacro -%}
+
+{%- macro bgp_neighbor_first_ip(linknet, asn, description, update_source, prefix_list) -%}
+ {{ bgp_neighbor(linknet, asn, description, update_source, prefix_list, linknet | first_ip ) }}
+{%- endmacro -%}
+
+{%- macro bgp_neighbor_last_ip(linknet, asn, description, update_source, prefix_list) -%}
+ {{ bgp_neighbor(linknet, asn, description, update_source, prefix_list, linknet | last_ip ) }}
+{%- endmacro -%}
+
+{%- macro bgp_neighbor(linknet, asn, description, update_source, prefix_list, neighbor) -%}
+  network {{ linknet | network }} mask {{ linknet | netmask }}
+  !
+  neighbor {{ neighbor }} remote-as {{ asn }}
+  neighbor {{ neighbor }} inherit peer-session BGP-SDA
+  neighbor {{ neighbor }} description "{{ description }}"
+  neighbor {{ neighbor }} update-source {{ update_source }}
+  {%- if prefix_list is defined %}
+  {%- if prefix_list %}
+  neighbor {{ neighbor }} prefix-list deny-default-route in
+  {%- endif %}
+  {%- endif %}
+  neighbor {{ neighbor }} activate
+{%- endmacro -%}
