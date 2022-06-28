@@ -1,0 +1,60 @@
+{%- import 'macros.j2' as macros %}
+! SDA {{ local }}
+! {{ config.tcn[local].hostname }}
+
+hostname {{ config.tcn[local].hostname }}
+ip domain name {{ config.global.domain }}
+snmp-server location {{ config.tcn[local].snmp_location }}
+
+! Linknet to FUSION1
+interface {{ config.tcn[local].interfaces.fusion1.port }}
+ description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
+ no switchport
+ {{ macros.get_last_ip(config.fusion.fusion1.interfaces[local].linknet) }}
+ {{ macros.l3_interface_common(config) }}
+!
+
+! Linknet to FUSION2
+interface {{ config.tcn[local].interfaces.fusion2.port }}
+ description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
+ no switchport
+ {{ macros.get_last_ip(config.fusion.fusion2.interfaces[local].linknet) }}
+ {{ macros.l3_interface_common(config) }}
+!
+
+! Loopback
+interface Lo0
+ ip address {{ config.tcn[local].ip }} 255.255.255.255
+ no shutdown
+ ip pim sparse-mode
+!
+{% include 'common.j2' %}
+!
+router bgp {{ config.tcn[local].asn }}
+{% include 'bgp_common.j2' %}
+ !
+{% include 'bgp_template.j2' %}
+ !
+ address-family ipv4
+  network {{ config.tcn[local].ip }} mask 255.255.255.255
+  !
+  ! FUSION1
+  {{ macros.bgp_neighbor_first_ip(
+    config.fusion.fusion1.interfaces[local].linknet,
+    config.fusion.asn,
+    "eBGP to FUSION1:" + config.fusion.fusion1.hostname + ":" + config.fusion.fusion1.interfaces[local].port + ":" + config.fusion.fusion1.interfaces[local].vrf,
+    config.tcn[local].interfaces.fusion1.port,
+    prefix_list=false
+  )}}
+  !
+  ! FUSION2
+  {{ macros.bgp_neighbor_first_ip(
+    config.fusion.fusion2.interfaces[local].linknet,
+    config.fusion.asn,
+    "eBGP to FUSION2:" + config.fusion.fusion2.hostname + ":" + config.fusion.fusion2.interfaces[local].port + ":" + config.fusion.fusion2.interfaces[local].vrf,
+    config.tcn[local].interfaces.fusion2.port,
+    prefix_list=false
+  )}}
+ !
+ exit-address-family
+!
