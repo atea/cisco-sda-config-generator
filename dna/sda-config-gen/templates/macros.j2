@@ -6,23 +6,6 @@
  ip address {{ ip_net | last_ip }} {{ ip_net | netmask }}
 {%- endmacro -%}
 
-{%- macro l3_interface_common(config) -%}
- no shutdown
- no ip redirects
- bfd interval {{ config.global.bfd.interval }} min_rx {{ config.global.bfd.min_rx }} multiplier {{ config.global.bfd.multiplier }}
- ip pim sparse-mode
- ip pim bfd
- load-interval 30
-{%- endmacro -%}
-
-{%- macro l2_interface_common(config) -%}
- switchport
- switchport mode trunk
- switchport nonegotiate
- no shutdown
- load-interval 30
-{%- endmacro -%}
-
 {%- macro bgp_neighbor_first_ip(linknet, asn, description, update_source, prefix_list) -%}
  {{ bgp_neighbor(linknet, asn, description, update_source, prefix_list, linknet | first_ip ) }}
 {%- endmacro -%}

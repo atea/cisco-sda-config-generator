@@ -8,7 +8,7 @@ interface {{ config.fusion[local].interfaces.tcn1.port }}
  no switchport
  vrf forwarding {{ config.fusion[local].interfaces.tcn1.vrf }}
  {{ macros.get_first_ip(config.fusion[local].interfaces.tcn1.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to TCN2
@@ -17,7 +17,7 @@ interface {{ config.fusion[local].interfaces.tcn2.port }}
  no switchport
  vrf forwarding {{ config.fusion[local].interfaces.tcn2.vrf }}
  {{ macros.get_first_ip(config.fusion[local].interfaces.tcn2.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FEXIT1
@@ -32,7 +32,7 @@ interface {{ config.fusion[local].interfaces.fexit1.port }}.{{ config.fusion[loc
  encapsulation dot1q {{ config.fusion[local].interfaces.fexit1.tag }}
  vrf forwarding {{ config.fusion[local].interfaces.fexit1.vrf }}
  {{ macros.get_first_ip(config.fusion[local].interfaces.fexit1.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FEXIT2
@@ -47,7 +47,7 @@ interface {{ config.fusion[local].interfaces.fexit2.port }}.{{ config.fusion[loc
  encapsulation dot1q {{ config.fusion[local].interfaces.fexit2.tag }}
  vrf forwarding {{ config.fusion[local].interfaces.fexit2.vrf }}
  {{ macros.get_first_ip(config.fusion[local].interfaces.fexit2.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Deny default route ingress to FUSION
@@ -55,7 +55,7 @@ ip prefix-list deny-default-route seq 5 permit 0.0.0.0/0 ge 1
 !
 router bgp {{ config.fusion.asn }}
  !
- {% include 'bgp_template.j2' %}
+{% include 'includes/bgp_template.j2' %}
  !
  ! TCN1
  address-family ipv4 vrf {{ config.fusion[local].interfaces.tcn1.vrf }}

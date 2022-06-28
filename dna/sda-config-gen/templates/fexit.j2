@@ -9,7 +9,7 @@ snmp-server location {{ config.fexit[local].snmp_location }}
 ! Linknet to FUSION1
 interface {{ config.fexit[local].interfaces.fusion1.port }}
  description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
- {{ macros.l2_interface_common(config) }}
+{% include 'includes/l2_interface.j2' %}
  switchport trunk allowed vlan {{ config.fexit[local].interfaces.fusion1.allowed }}
  switchport trunk native vlan {{ config.fexit[local].interfaces.fusion1.native }}
 !
@@ -19,13 +19,13 @@ vlan {{ config.fusion.fusion1.interfaces[local].tag }}
 interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
  description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}.{{ config.fusion.fusion1.interfaces[local].tag }}:{{ config.fusion.fusion1.interfaces[local].vrf }}
  {{ macros.get_last_ip(config.fusion.fusion1.interfaces[local].linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FUSION2
 interface {{ config.fexit[local].interfaces.fusion2.port }}
  description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
- {{ macros.l2_interface_common(config) }}
+{% include 'includes/l2_interface.j2' %}
  switchport trunk allowed vlan {{ config.fexit[local].interfaces.fusion2.allowed }}
  switchport trunk native vlan {{ config.fexit[local].interfaces.fusion2.native }}
 !
@@ -35,7 +35,7 @@ vlan {{ config.fusion.fusion2.interfaces[local].tag }}
 interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
  description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}.{{ config.fusion.fusion2.interfaces[local].tag }}:{{ config.fusion.fusion2.interfaces[local].vrf }}
  {{ macros.get_last_ip(config.fusion.fusion2.interfaces[local].linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet between FEXIT1 and FEXIT2
@@ -47,7 +47,7 @@ interface {{ config.fexit[local].interfaces.fexit.port }}
  {%- else %}
  {{ macros.get_last_ip(config.fexit[local].interfaces.fexit.linknet) }}
  {%- endif %}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FS1a
@@ -55,7 +55,7 @@ interface {{ config.fexit[local].interfaces.fs1a.port }}
  description lnk:{{ config.fs.fs1a.hostname }}:{{ config.fs.fs1a.interfaces[local].port }}
  no switchport
  {{ macros.get_first_ip(config.fexit[local].interfaces.fs1a.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FS1b
@@ -63,7 +63,7 @@ interface {{ config.fexit[local].interfaces.fs1b.port }}
  description lnk:{{ config.fs.fs1b.hostname }}:{{ config.fs.fs1b.interfaces[local].port }}
  no switchport
  {{ macros.get_first_ip(config.fexit[local].interfaces.fs1b.linknet) }}
- {{ macros.l3_interface_common(config) }}
+{% include 'includes/l3_interface.j2' %}
 !
 
 ! Loopback
@@ -74,12 +74,12 @@ interface Lo0
 !
 
 !
-{% include 'common.j2' %}
+{% include 'includes/common.j2' %}
 !
 router bgp {{ config.fexit[local].asn }}
-{% include 'bgp_common.j2' %}
+{% include 'includes/bgp_common.j2' %}
  !
-{% include 'bgp_template.j2' %}
+{% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
   network {{ config.fexit[local].ip }} mask 255.255.255.255
