@@ -49,6 +49,8 @@ interface {{ local_config.interfaces.fexit.port }}
  {{ macros.get_last_ip(local_config.interfaces.fexit.linknet) }}
  {%- endif %}
 {% include 'includes/l3_interface.j2' %}
+ ip router isis 
+ isis network point-to-point 
 !
 
 ! Linknet to FS1a
@@ -72,10 +74,13 @@ interface Lo0
  ip address {{ local_config.ip }} 255.255.255.255
  no shutdown
  ip pim sparse-mode
+ ip router isis 
 !
 
 !
 {% include 'includes/common.j2' %}
+!
+{% include 'includes/isis_common.j2' %}
 !
 router bgp {{ config.fexit.asn }}
 {% include 'includes/bgp_common.j2' %}

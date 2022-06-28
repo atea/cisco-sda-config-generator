@@ -1,0 +1,13 @@
+! ISIS to distribute Lo0, so that auto-configured multi-hop iBGP works
+router isis
+ {%- if local.endswith('1') or local.endswith('a') %}
+ net 49.0000.0000.0000.0001.00
+ {%- else %}
+ net 49.0000.0000.0000.0002.00
+ {%- endif %}
+ domain-password {{ config.global.isis_password }}
+ metric-style wide
+ log-adjacency-changes
+ nsf ietf
+ bfd all-interfaces
+!

@@ -33,6 +33,8 @@ interface {{ local_config.interfaces.fs.port }}
  {{ macros.get_last_ip(local_config.interfaces.fs.linknet) }}
  {%- endif %}
 {% include 'includes/l3_interface.j2' %}
+ ip router isis 
+ isis network point-to-point 
 !
 
 ! Loopback
@@ -40,6 +42,7 @@ interface Lo0
  ip address {{ local_config.ip }} 255.255.255.255
  no shutdown
  ip pim sparse-mode
+ ip router isis 
 !
 
 !
