@@ -57,3 +57,7 @@ generate_config(env, 'tcn', 'tcn2')
 # generate fexit1 + fexit2
 generate_config(env, 'fexit', 'fexit1', 'fexit2')
 generate_config(env, 'fexit', 'fexit2', 'fexit1')
+
+# generate fs1a + fs1b
+generate_config(env, 'fs', 'fs1a', 'fs1b')
+generate_config(env, 'fs', 'fs1b', 'fs1a')
