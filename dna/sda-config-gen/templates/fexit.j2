@@ -1,17 +1,18 @@
 {%- import 'macros.j2' as macros %}
+{%- set local_config = config.fexit[local] %}
 ! SDA {{ local }}
-! {{ config.fexit[local].hostname }}
+! {{ local_config.hostname }}
 
-hostname {{ config.fexit[local].hostname }}
+hostname {{ local_config.hostname }}
 ip domain name {{ config.global.domain }}
-snmp-server location {{ config.fexit[local].snmp_location }}
+snmp-server location {{ local_config.snmp_location }}
 
 ! Linknet to FUSION1
-interface {{ config.fexit[local].interfaces.fusion1.port }}
+interface {{ local_config.interfaces.fusion1.port }}
  description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
- switchport trunk allowed vlan {{ config.fexit[local].interfaces.fusion1.allowed }}
- switchport trunk native vlan {{ config.fexit[local].interfaces.fusion1.native }}
+ switchport trunk allowed vlan {{ local_config.interfaces.fusion1.allowed }}
+ switchport trunk native vlan {{ local_config.interfaces.fusion1.native }}
 !
 vlan {{ config.fusion.fusion1.interfaces[local].tag }}
  name lnk:{{ config.fusion.fusion1.hostname }}_mgmt
@@ -23,11 +24,11 @@ interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
 !
 
 ! Linknet to FUSION2
-interface {{ config.fexit[local].interfaces.fusion2.port }}
+interface {{ local_config.interfaces.fusion2.port }}
  description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
- switchport trunk allowed vlan {{ config.fexit[local].interfaces.fusion2.allowed }}
- switchport trunk native vlan {{ config.fexit[local].interfaces.fusion2.native }}
+ switchport trunk allowed vlan {{ local_config.interfaces.fusion2.allowed }}
+ switchport trunk native vlan {{ local_config.interfaces.fusion2.native }}
 !
 vlan {{ config.fusion.fusion2.interfaces[local].tag }}
  name lnk:{{ config.fusion.fusion2.hostname }}_mgmt
@@ -39,36 +40,36 @@ interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
 !
 
 ! Linknet between FEXIT1 and FEXIT2
-interface {{ config.fexit[local].interfaces.fexit.port }}
+interface {{ local_config.interfaces.fexit.port }}
  description lnk:{{ config.fexit[peer].hostname }}:{{ config.fexit[peer].interfaces.fexit.port }}
  no switchport
  {%- if local.endswith('1') %}
- {{ macros.get_first_ip(config.fexit[local].interfaces.fexit.linknet) }}
+ {{ macros.get_first_ip(local_config.interfaces.fexit.linknet) }}
  {%- else %}
- {{ macros.get_last_ip(config.fexit[local].interfaces.fexit.linknet) }}
+ {{ macros.get_last_ip(local_config.interfaces.fexit.linknet) }}
  {%- endif %}
 {% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FS1a
-interface {{ config.fexit[local].interfaces.fs1a.port }}
+interface {{ local_config.interfaces.fs1a.port }}
  description lnk:{{ config.fs.fs1a.hostname }}:{{ config.fs.fs1a.interfaces[local].port }}
  no switchport
- {{ macros.get_first_ip(config.fexit[local].interfaces.fs1a.linknet) }}
+ {{ macros.get_first_ip(local_config.interfaces.fs1a.linknet) }}
 {% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FS1b
-interface {{ config.fexit[local].interfaces.fs1b.port }}
+interface {{ local_config.interfaces.fs1b.port }}
  description lnk:{{ config.fs.fs1b.hostname }}:{{ config.fs.fs1b.interfaces[local].port }}
  no switchport
- {{ macros.get_first_ip(config.fexit[local].interfaces.fs1b.linknet) }}
+ {{ macros.get_first_ip(local_config.interfaces.fs1b.linknet) }}
 {% include 'includes/l3_interface.j2' %}
 !
 
 ! Loopback
 interface Lo0
- ip address {{ config.fexit[local].ip }} 255.255.255.255
+ ip address {{ local_config.ip }} 255.255.255.255
  no shutdown
  ip pim sparse-mode
 !
@@ -82,7 +83,7 @@ router bgp {{ config.fexit.asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
-  network {{ config.fexit[local].ip }} mask 255.255.255.255
+  network {{ local_config.ip }} mask 255.255.255.255
   !
   ! FUSION1
   {{ macros.bgp_neighbor_first_ip(
@@ -104,19 +105,19 @@ router bgp {{ config.fexit.asn }}
   !
   ! FS1a
   {{ macros.bgp_neighbor_last_ip(
-    config.fexit[local].interfaces.fs1a.linknet,
+    local_config.interfaces.fs1a.linknet,
     config.fs.asn,
     "eBGP to FS1a:" + config.fs.fs1a.hostname + ":" + config.fs.fs1a.interfaces[local].port,
-    config.fexit[local].interfaces.fs1a.port,
+    local_config.interfaces.fs1a.port,
     prefix_list=false
   )}}
   !
   ! FS1b
   {{ macros.bgp_neighbor_last_ip(
-    config.fexit[local].interfaces.fs1b.linknet,
+    local_config.interfaces.fs1b.linknet,
     config.fs.asn,
     "eBGP to FS1b:" + config.fs.fs1b.hostname + ":" + config.fs.fs1b.interfaces[local].port,
-    config.fexit[local].interfaces.fs1b.port,
+    local_config.interfaces.fs1b.port,
     prefix_list=false
   )}}
  !
