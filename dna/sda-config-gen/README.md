@@ -6,7 +6,7 @@ It will generate configuration files for the following nodes;
  * FUSION1 and FUSION2 (core, PE nodes, etc)
  * TCN1 and TCN2 (two Transit Control Plane nodes)
  * FEXIT1 and FEXIT2 (two-node fabric site to provide default way out of all other fabrics)
- * FS1 and FS2 (first fabric site connected to FEXIT1 and FEXIT2 via SD-transit)
+ * FS1a and FS1b (first fabric site connected to FEXIT1 and FEXIT2 via SD-transit)
 
 The following is assumed;
 
@@ -15,8 +15,8 @@ The following is assumed;
  * eBGP is used between each layer (i.e. between FS1 and FEXIT, between FEXIT and FUSION, and between FUSION and each TCN)
  * TCN nodes are connected directly to FUSION
  * ISIS between FEXIT1+2 (to distribute Lo0 for the automatically configured iBGP to avoid multihop via FS or FUSION)
- * Device-specific config is properly configured (proper descriptions and similar), while common config only has bare minimum to get the device discoverable and configurable from DNAC. Full and best-practice config pushed via dayN templates from DNAC when provisioning (SNMP ACLs, VTY config, etc).
- 
+ * Device-specific config is properly configured (proper descriptions and similar), while common config only has bare minimum to get the device discoverable and configurable from DNAC. Full and best-practice config pushed via dayN templates from DNAC when provisioning the device (SNMP ACLs, VTY config, etc).
+
 ```
                                                                _______________ 
                                                               |               |
@@ -25,12 +25,12 @@ The following is assumed;
                                                                       |
      _______________              _______________              _______|_______              _______________
     |               |____________|               |____________|               |____________|               |
-    | FS1 #1 (B+CP) |____    ____| FEXIT1 (B+CP) |____    ____|    FUSION1    |____    ____|      TCN1     |
+    |  FS1a (B+CP)  |____    ____| FEXIT1 (B+CP) |____    ____|    FUSION1    |____    ____|      TCN1     |
     |_______________|    \  /    |_______________|    \  /    |_______________|    \  /    |_______________|
             |             \/             |             \/             |             \/            
      _______|_______      /\      _______|_______      /\      _______|_______      /\      _______________
     |               |____/  \____|               |____/  \____|               |____/  \____|               |
-    | FS1 #2 (B+CP) |____________| FEXIT2 (B+CP) |____________|    FUSION2    |____________|      TCN2     |
+    |  FS1b (B+CP)  |____________| FEXIT2 (B+CP) |____________|    FUSION2    |____________|      TCN2     |
     |_______________|            |_______________|            |_______________|            |_______________|
                                                                       |
                                                                _______|_______ 
