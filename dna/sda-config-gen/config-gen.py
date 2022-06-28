@@ -9,6 +9,23 @@ def yaml_from_file(file):
   with open(file, 'r') as f:
     return yaml.safe_load(f)
 
+work_dir = os.path.dirname(os.path.realpath(__file__))
+config_file = work_dir + '/config.yml'
+config = yaml_from_file(config_file)
+
+def generate_config(env, template, local, peer=None):
+  t = env.get_template(template + '.j2')
+  d = t.render(config=config, local=local, peer=peer)
+  save_config(work_dir, local, d)
+
+def save_config(work_dir, hostname, data):
+  full_path = work_dir + '/generated-configs/' + hostname + '.txt'
+  save_to_file(full_path, data)
+
+def save_to_file(filename, data):
+  with open(filename, 'w') as f:
+    print(data, file=f)
+
 def get_netmask(network):
   return ipaddress.ip_network(network).netmask
 
@@ -21,10 +38,6 @@ def get_first_ip(network):
 def get_last_ip(network):
   return list(ipaddress.ip_network(network).hosts())[-1]
 
-work_dir = os.path.dirname(os.path.realpath(__file__))
-config_file = work_dir + '/config.yml'
-config = yaml_from_file(config_file)
-
 # prepare templates & filters
 file_loader = FileSystemLoader('templates')
 env = Environment(loader=file_loader)
@@ -34,23 +47,13 @@ env.filters['first_ip'] = get_first_ip
 env.filters['last_ip'] = get_last_ip
 
 # generate fusion1 + fusion2
-template = env.get_template('fusion.j2')
-fusion1 = template.render(config=config, local='fusion1')
-fusion2 = template.render(config=config, local='fusion2')
+generate_config(env, 'fusion', 'fusion1')
+generate_config(env, 'fusion', 'fusion2')
 
 # generate tcn1 + tcn2
-template = env.get_template('tcn.j2')
-tcn1 = template.render(config=config, local='tcn1')
-tcn2 = template.render(config=config, local='tcn2')
+generate_config(env, 'tcn', 'tcn1')
+generate_config(env, 'tcn', 'tcn2')
 
 # generate fexit1 + fexit2
-template = env.get_template('fexit.j2')
-fexit1 = template.render(config=config, local='fexit1', peer='fexit2')
-fexit2 = template.render(config=config, local='fexit2', peer='fexit1')
-
-#print(fusion1)
-#print(fusion2)
-#print(tcn1)
-#print(tcn2)
-#print(fexit1)
-print(fexit2)
+generate_config(env, 'fexit', 'fexit1', 'fexit2')
+generate_config(env, 'fexit', 'fexit2', 'fexit1')
