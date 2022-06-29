@@ -89,6 +89,7 @@ router bgp {{ config.fexit.asn }}
  !
  address-family ipv4
   network {{ local_config.ip }} mask 255.255.255.255
+  network {{ local_config.interfaces.fexit.linknet | network }} mask {{ local_config.interfaces.fexit.linknet | netmask }}
   !
   ! FUSION1
   {{ macros.bgp_neighbor_first_ip(
