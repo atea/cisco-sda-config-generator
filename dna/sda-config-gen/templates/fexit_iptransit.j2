@@ -1,0 +1,30 @@
+{%- import 'macros.j2' as macros %}
+{%- set local_config = config.fexit[local] %}
+! SDA {{ local }}
+! {{ local_config.hostname }}
+
+! fix bgp neighbors after dnac has deployed
+router bgp {{ config.fexit.asn }}
+  {{ macros.bgp_neighbor_inherit_last_ip(config.iptransit[local].fusion1.INFRA_VN.linknet) }}
+  {{ macros.bgp_neighbor_inherit_last_ip(config.iptransit[local].fusion2.INFRA_VN.linknet) }}
+  !
+  ! FUSION1
+{%- for vrf in config.iptransit[local].fusion1 %}
+ {%- if vrf != 'INFRA_VN' %}
+  address-family ipv4 vrf {{ vrf }}
+    maximum-paths {{ config.global.bgp_paths }}
+    neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
+  exit-address-family
+  {%- endif %}
+{%- endfor %}
+  !
+  ! FUSION 2
+{%- for vrf in config.iptransit[local].fusion2 %}
+ {%- if vrf != 'INFRA_VN' %}
+  address-family ipv4 vrf {{ vrf }}
+    maximum-paths {{ config.global.bgp_paths }}
+    neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
+  exit-address-family
+  {%- endif %}
+{%- endfor %}
+!

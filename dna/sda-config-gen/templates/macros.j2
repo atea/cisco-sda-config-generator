@@ -28,3 +28,7 @@
   {%- endif %}
   neighbor {{ neighbor }} activate
 {%- endmacro -%}
+
+{%- macro bgp_neighbor_inherit_last_ip(linknet) -%}
+  neighbor {{ linknet | last_ip }} inherit peer-session BGP-SDA
+{%- endmacro -%}

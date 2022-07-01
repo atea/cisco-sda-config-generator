@@ -149,3 +149,71 @@ fs:
       fs:
         <<: *fs
         port: Fo1/0/2
+
+iptransit:
+  fexit1:
+    fusion1:
+      INFRA_VN:
+        tag: '401'
+        linknet: 10.99.10.0/30
+        vrf: mgmt_vrf
+      fallback:
+        tag: '402'
+        linknet: 10.99.10.4/30
+        vrf: fallback_vrf
+      guest:
+        tag: '403'
+        linknet: 10.99.10.8/30
+        vrf: guest_vrf
+      iot:
+        tag: '404'
+        linknet: 10.99.10.12/30
+    fusion2:
+      INFRA_VN:
+        tag: '501'
+        linknet: 10.99.10.16/30
+        vrf: mgmt_vrf
+      fallback:
+        tag: '502'
+        linknet: 10.99.10.20/30
+        vrf: fallback_vrf
+      guest:
+        tag: '503'
+        linknet: 10.99.10.24/30
+        vrf: guest_vrf
+      iot:
+        tag: '504'
+        linknet: 10.99.10.28/30
+  fexit2:
+    fusion1:
+      INFRA_VN:
+        tag: '401'
+        linknet: 10.99.20.0/30
+        vrf: mgmt_vrf
+      fallback:
+        tag: '402'
+        linknet: 10.99.20.4/30
+        vrf: fallback_vrf
+      guest:
+        tag: '403'
+        linknet: 10.99.20.8/30
+        vrf: guest_vrf
+      iot:
+        tag: '404'
+        linknet: 10.99.20.12/30
+    fusion2:
+      INFRA_VN:
+        tag: '501'
+        linknet: 10.99.20.16/30
+        vrf: mgmt_vrf
+      fallback:
+        tag: '502'
+        linknet: 10.99.20.20/30
+        vrf: fallback_vrf
+      guest:
+        tag: '503'
+        linknet: 19.99.20.24/30
+        vrf: guest_vrf
+      iot:
+        tag: '504'
+        linknet: 10.99.20.28/30

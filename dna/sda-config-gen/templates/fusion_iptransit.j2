@@ -1,0 +1,72 @@
+{%- import 'macros.j2' as macros %}
+{%- set local_config = config.fusion[local] %}
+! SDA {{ local }}
+! {{ local_config.hostname }}
+
+! Linknet to FEXIT1
+{%- for vrf in config.iptransit.fexit1[local] %}
+interface {{ local_config.interfaces.fexit1.port }}.{{ config.iptransit.fexit1[local][vrf].tag }}
+ description lnk:{{ config.fexit.fexit1.hostname }}:Vlan{{ config.iptransit.fexit1[local][vrf].tag }}:{{ vrf }}
+ encapsulation dot1q {{ config.iptransit.fexit1[local][vrf].tag }}
+ {%- if config.iptransit.fexit1[local][vrf].vrf is defined %}
+ vrf forwarding {{ config.iptransit.fexit1[local][vrf].vrf }}
+ {%- else %}
+ vrf forwarding {{ vrf }}
+ {%- endif %}
+ {{ macros.get_last_ip(config.iptransit.fexit1[local][vrf].linknet) }}
+{% include 'includes/l3_interface.j2' %}
+!
+{%- endfor %}
+
+! Linknet to FEXIT2
+{%- for vrf in config.iptransit.fexit2[local] %}
+interface {{ local_config.interfaces.fexit2.port }}.{{ config.iptransit.fexit2[local][vrf].tag }}
+ description lnk:{{ config.fexit.fexit2.hostname }}:Vlan{{ config.iptransit.fexit2[local][vrf].tag }}:{{ vrf }}
+ encapsulation dot1q {{ config.iptransit.fexit2[local][vrf].tag }}
+ {%- if config.iptransit.fexit2[local][vrf].vrf is defined %}
+ vrf forwarding {{ config.iptransit.fexit2[local][vrf].vrf }}
+ {%- else %}
+ vrf forwarding {{ vrf }}
+ {%- endif %}
+ {{ macros.get_last_ip(config.iptransit.fexit2[local][vrf].linknet) }}
+{% include 'includes/l3_interface.j2' %}
+!
+{%- endfor %}
+
+! BGP
+router bgp {{ config.fusion.asn }}
+! BGP to FEXIT1
+{%- for vrf in config.iptransit.fexit1[local] %}
+ {%- if config.iptransit.fexit1[local][vrf].vrf is defined %}
+ address-family ipv4 vrf {{ config.iptransit.fexit1[local][vrf].vrf }}
+ {%- else %}
+ address-family ipv4 vrf {{ vrf }}
+ {%- endif %}
+  {{ macros.bgp_neighbor_first_ip(
+    config.iptransit.fexit1[local][vrf].linknet,
+    config.fexit.asn,
+    "eBGP to FEXIT1:" + config.fexit.fexit1.hostname + ":Vlan" + config.iptransit.fexit1[local][vrf].tag + ":" + vrf,
+    local_config.interfaces.fexit1.port + "." + config.iptransit.fexit1[local][vrf].tag,
+    prefix_list=true
+  )}}
+ exit-address-family
+ !
+{%- endfor %}
+!
+! BGP to FEXIT2
+{%- for vrf in config.iptransit.fexit2[local] %}
+ {%- if config.iptransit.fexit2[local][vrf].vrf is defined %}
+ address-family ipv4 vrf {{ config.iptransit.fexit2[local][vrf].vrf }}
+ {%- else %}
+ address-family ipv4 vrf {{ vrf }}
+ {%- endif %}
+  {{ macros.bgp_neighbor_first_ip(
+    config.iptransit.fexit2[local][vrf].linknet,
+    config.fexit.asn,
+    "eBGP to FEXIT1:" + config.fexit.fexit2.hostname + ":Vlan" + config.iptransit.fexit2[local][vrf].tag + ":" + vrf,
+    local_config.interfaces.fexit2.port + "." + config.iptransit.fexit2[local][vrf].tag,
+    prefix_list=true
+  )}}
+ exit-address-family
+ !
+{%- endfor %}

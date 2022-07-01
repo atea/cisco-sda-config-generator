@@ -16,7 +16,7 @@ config = yaml_from_file(config_file)
 def generate_config(env, template, local, peer=None):
   t = env.get_template(template + '.j2')
   d = t.render(config=config, local=local, peer=peer)
-  save_config(work_dir, local, d)
+  save_config(work_dir, template + '_' + local, d)
 
 def save_config(work_dir, hostname, data):
   full_path = work_dir + '/generated-configs/' + hostname + '.txt'
@@ -61,3 +61,11 @@ generate_config(env, 'fexit', 'fexit2', 'fexit1')
 # generate fs1a + fs1b
 generate_config(env, 'fs', 'fs1a', 'fs1b')
 generate_config(env, 'fs', 'fs1b', 'fs1a')
+
+# generate fexit bgp peer-session inherit
+generate_config(env, 'fexit_iptransit', 'fexit1')
+generate_config(env, 'fexit_iptransit', 'fexit2')
+
+# generate fusion ip-transit
+generate_config(env, 'fusion_iptransit', 'fusion1')
+generate_config(env, 'fusion_iptransit', 'fusion2')
