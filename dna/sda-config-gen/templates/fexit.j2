@@ -88,6 +88,7 @@ router bgp {{ config.fexit.asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
+  maximum-paths {{ config.global.bgp_paths }}
   network {{ local_config.ip }} mask 255.255.255.255
   network {{ local_config.interfaces.fexit.linknet | network }} mask {{ local_config.interfaces.fexit.linknet | netmask }}
   !

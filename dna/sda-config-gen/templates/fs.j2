@@ -54,6 +54,7 @@ router bgp {{ config.fs.asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
+  maximum-paths {{ config.global.bgp_paths }}
   redistribute connected
   redistribute isis level-1-2
   network {{ local_config.ip }} mask 255.255.255.255
