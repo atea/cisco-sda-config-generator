@@ -19,7 +19,7 @@
   !
   neighbor {{ neighbor }} remote-as {{ asn }}
   neighbor {{ neighbor }} inherit peer-session BGP-SDA
-  neighbor {{ neighbor }} description "{{ description }}"
+  neighbor {{ neighbor }} description {{ description }}
   neighbor {{ neighbor }} update-source {{ update_source }}
   {%- if prefix_list is defined %}
   {%- if prefix_list %}
@@ -29,6 +29,15 @@
   neighbor {{ neighbor }} activate
 {%- endmacro -%}
 
-{%- macro bgp_neighbor_inherit_last_ip(linknet) -%}
+{%- macro bgp_neighbor_iptransit_last_ip(linknet, description) -%}
   neighbor {{ linknet | last_ip }} inherit peer-session BGP-SDA
+  neighbor {{ linknet | last_ip }} description {{ description }}
+{%- endmacro -%}
+
+{%- macro get_vrf(vrf_primary, vrf_secondary) -%}
+{%- if vrf_primary is defined -%}
+{{ vrf_primary }}
+{%- else -%}
+{{ vrf_secondary }}
+{%- endif -%}
 {%- endmacro -%}
