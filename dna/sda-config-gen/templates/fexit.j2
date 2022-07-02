@@ -11,7 +11,6 @@ snmp-server location {{ local_config.snmp_location }}
 interface {{ local_config.interfaces.fusion1.port }}
  description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
- switchport trunk allowed vlan {{ local_config.interfaces.fusion1.allowed }}
  switchport trunk native vlan {{ local_config.interfaces.fusion1.native }}
 !
 vlan {{ config.fusion.fusion1.interfaces[local].tag }}
@@ -27,7 +26,6 @@ interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
 interface {{ local_config.interfaces.fusion2.port }}
  description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
- switchport trunk allowed vlan {{ local_config.interfaces.fusion2.allowed }}
  switchport trunk native vlan {{ local_config.interfaces.fusion2.native }}
 !
 vlan {{ config.fusion.fusion2.interfaces[local].tag }}
