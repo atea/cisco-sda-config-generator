@@ -29,7 +29,7 @@ interface {{ local_config.interfaces.fexit1.port }}
  load-interval 30
 !
 interface {{ local_config.interfaces.fexit1.port }}.{{ local_config.interfaces.fexit1.tag }}
- description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit1.tag }}:GRT
+ description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit1.tag }}:INFRA_VN
  encapsulation dot1q {{ local_config.interfaces.fexit1.tag }}
  vrf forwarding {{ local_config.interfaces.fexit1.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.fexit1.linknet) }}
@@ -44,7 +44,7 @@ interface {{ local_config.interfaces.fexit2.port }}
  load-interval 30
 !
 interface {{ local_config.interfaces.fexit2.port }}.{{ local_config.interfaces.fexit2.tag }}
- description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit2.tag }}:GRT
+ description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit2.tag }}:INFRA_VN
  encapsulation dot1q {{ local_config.interfaces.fexit2.tag }}
  vrf forwarding {{ local_config.interfaces.fexit2.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.fexit2.linknet) }}
