@@ -85,7 +85,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fexit1.linknet,
     config.fexit.asn,
-    "eBGP to FEXIT1:" + config.fexit.fexit1.hostname + ":" + config.fexit.fexit1.interfaces[local].port + ":GRT",
+    "eBGP to FEXIT1:" + config.fexit.fexit1.hostname + ":" + config.fexit.fexit1.interfaces[local].port + ":Vlan" + local_config.interfaces.fexit1.tag + ":INFRA_VN",
     local_config.interfaces.fexit1.port + "." + local_config.interfaces.fexit1.tag,
     prefix_list=true
   )}}
@@ -96,7 +96,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fexit2.linknet,
     config.fexit.asn,
-    "eBGP to FEXIT2:" + config.fexit.fexit2.hostname + ":" + config.fexit.fexit2.interfaces[local].port + ":GRT",
+    "eBGP to FEXIT2:" + config.fexit.fexit2.hostname + ":" + config.fexit.fexit2.interfaces[local].port + ":Vlan" + local_config.interfaces.fexit2.tag + ":INFRA_VN",
     local_config.interfaces.fexit2.port + "." + local_config.interfaces.fexit2.tag,
     prefix_list=true
   )}}
