@@ -5,7 +5,7 @@
 
 ! Linknet to TCN1
 interface {{ local_config.interfaces.tcn1.port }}
- description lnk:{{ config.tcn.tcn1.hostname }}:{{ config.tcn.tcn1.interfaces[local].port }}
+ description link; {{ config.tcn.tcn1.hostname }}; {{ config.tcn.tcn1.interfaces[local].port }}
  no switchport
  vrf forwarding {{ local_config.interfaces.tcn1.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.tcn1.linknet) }}
@@ -14,7 +14,7 @@ interface {{ local_config.interfaces.tcn1.port }}
 
 ! Linknet to TCN2
 interface {{ local_config.interfaces.tcn2.port }}
- description lnk:{{ config.tcn.tcn2.hostname }}:{{ config.tcn.tcn2.interfaces[local].port }}
+ description link; {{ config.tcn.tcn2.hostname }}; {{ config.tcn.tcn2.interfaces[local].port }}
  no switchport
  vrf forwarding {{ local_config.interfaces.tcn2.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.tcn2.linknet) }}
@@ -23,13 +23,13 @@ interface {{ local_config.interfaces.tcn2.port }}
 
 ! Linknet to FEXIT1
 interface {{ local_config.interfaces.fexit1.port }}
- description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}
+ description link; {{ config.fexit.fexit1.hostname }}; {{ config.fexit.fexit1.interfaces[local].port }}
  no switchport
  no shutdown
  load-interval 30
 !
 interface {{ local_config.interfaces.fexit1.port }}.{{ local_config.interfaces.fexit1.tag }}
- description lnk:{{ config.fexit.fexit1.hostname }}:{{ config.fexit.fexit1.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit1.tag }}:INFRA_VN
+ description link; {{ config.fexit.fexit1.hostname }}; {{ config.fexit.fexit1.interfaces[local].port }}; Vlan{{ local_config.interfaces.fexit1.tag }}; INFRA_VN
  encapsulation dot1q {{ local_config.interfaces.fexit1.tag }}
  vrf forwarding {{ local_config.interfaces.fexit1.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.fexit1.linknet) }}
@@ -38,13 +38,13 @@ interface {{ local_config.interfaces.fexit1.port }}.{{ local_config.interfaces.f
 
 ! Linknet to FEXIT2
 interface {{ local_config.interfaces.fexit2.port }}
- description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}
+ description link; {{ config.fexit.fexit2.hostname }}; {{ config.fexit.fexit2.interfaces[local].port }}
  no switchport
  no shutdown
  load-interval 30
 !
 interface {{ local_config.interfaces.fexit2.port }}.{{ local_config.interfaces.fexit2.tag }}
- description lnk:{{ config.fexit.fexit2.hostname }}:{{ config.fexit.fexit2.interfaces[local].port }}:Vlan{{ local_config.interfaces.fexit2.tag }}:INFRA_VN
+ description link; {{ config.fexit.fexit2.hostname }}; {{ config.fexit.fexit2.interfaces[local].port }}; Vlan{{ local_config.interfaces.fexit2.tag }}; INFRA_VN
  encapsulation dot1q {{ local_config.interfaces.fexit2.tag }}
  vrf forwarding {{ local_config.interfaces.fexit2.vrf }}
  {{ macros.get_first_ip(local_config.interfaces.fexit2.linknet) }}
@@ -63,7 +63,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.tcn1.linknet,
     config.tcn.tcn1.asn,
-    "eBGP to TCN1:" + config.tcn.tcn1.hostname + ":" + config.tcn.tcn1.interfaces[local].port + ":GRT",
+    "eBGP to TCN1; " + config.tcn.tcn1.hostname + "; " + config.tcn.tcn1.interfaces[local].port + "; GRT",
     local_config.interfaces.tcn1.port,
     prefix_list=true
   )}}
@@ -74,7 +74,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.tcn2.linknet,
     config.tcn.tcn2.asn,
-    "eBGP to TCN2:" + config.tcn.tcn2.hostname + ":" + config.tcn.tcn2.interfaces[local].port + ":GRT",
+    "eBGP to TCN2; " + config.tcn.tcn2.hostname + "; " + config.tcn.tcn2.interfaces[local].port + "; GRT",
     local_config.interfaces.tcn2.port,
     prefix_list=true
   )}}
@@ -85,7 +85,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fexit1.linknet,
     config.fexit.asn,
-    "eBGP to FEXIT1:" + config.fexit.fexit1.hostname + ":" + config.fexit.fexit1.interfaces[local].port + ":Vlan" + local_config.interfaces.fexit1.tag + ":INFRA_VN",
+    "eBGP to FEXIT1; " + config.fexit.fexit1.hostname + "; " + config.fexit.fexit1.interfaces[local].port + "; Vlan" + local_config.interfaces.fexit1.tag + "; INFRA_VN",
     local_config.interfaces.fexit1.port + "." + local_config.interfaces.fexit1.tag,
     prefix_list=true
   )}}
@@ -96,7 +96,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fexit2.linknet,
     config.fexit.asn,
-    "eBGP to FEXIT2:" + config.fexit.fexit2.hostname + ":" + config.fexit.fexit2.interfaces[local].port + ":Vlan" + local_config.interfaces.fexit2.tag + ":INFRA_VN",
+    "eBGP to FEXIT2; " + config.fexit.fexit2.hostname + "; " + config.fexit.fexit2.interfaces[local].port + "; Vlan" + local_config.interfaces.fexit2.tag + "; INFRA_VN",
     local_config.interfaces.fexit2.port + "." + local_config.interfaces.fexit2.tag,
     prefix_list=true
   )}}

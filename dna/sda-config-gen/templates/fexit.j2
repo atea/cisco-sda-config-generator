@@ -9,37 +9,37 @@ snmp-server location {{ local_config.snmp_location }}
 
 ! Linknet to FUSION1
 interface {{ local_config.interfaces.fusion1.port }}
- description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
+ description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
  switchport trunk native vlan {{ local_config.interfaces.fusion1.native }}
 !
 vlan {{ config.fusion.fusion1.interfaces[local].tag }}
- name lnk:{{ config.fusion.fusion1.hostname }}_mgmt
+ name link; {{ config.fusion.fusion1.hostname }}_mgmt
 !
 interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
- description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}.{{ config.fusion.fusion1.interfaces[local].tag }}:{{ config.fusion.fusion1.interfaces[local].vrf }}
+ description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.fusion.fusion1.interfaces[local].tag }}; {{ config.fusion.fusion1.interfaces[local].vrf }}
  {{ macros.get_last_ip(config.fusion.fusion1.interfaces[local].linknet) }}
 {% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet to FUSION2
 interface {{ local_config.interfaces.fusion2.port }}
- description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
+ description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}
 {% include 'includes/l2_interface.j2' %}
  switchport trunk native vlan {{ local_config.interfaces.fusion2.native }}
 !
 vlan {{ config.fusion.fusion2.interfaces[local].tag }}
- name lnk:{{ config.fusion.fusion2.hostname }}_mgmt
+ name link; {{ config.fusion.fusion2.hostname }}_mgmt
 !
 interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
- description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}.{{ config.fusion.fusion2.interfaces[local].tag }}:{{ config.fusion.fusion2.interfaces[local].vrf }}
+ description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.fusion.fusion2.interfaces[local].tag }}; {{ config.fusion.fusion2.interfaces[local].vrf }}
  {{ macros.get_last_ip(config.fusion.fusion2.interfaces[local].linknet) }}
 {% include 'includes/l3_interface.j2' %}
 !
 
 ! Linknet between FEXIT1 and FEXIT2
 interface {{ local_config.interfaces.fexit.port }}
- description lnk:{{ config.fexit[peer].hostname }}:{{ config.fexit[peer].interfaces.fexit.port }}
+ description link; {{ config.fexit[peer].hostname }}; {{ config.fexit[peer].interfaces.fexit.port }}
  no switchport
  {%- if local.endswith('1') or local.endswith('a') %}
  {{ macros.get_first_ip(local_config.interfaces.fexit.linknet) }}
@@ -53,7 +53,7 @@ interface {{ local_config.interfaces.fexit.port }}
 
 ! Linknet to FS1a
 interface {{ local_config.interfaces.fs1a.port }}
- description lnk:{{ config.fs.fs1a.hostname }}:{{ config.fs.fs1a.interfaces[local].port }}
+ description link; {{ config.fs.fs1a.hostname }}; {{ config.fs.fs1a.interfaces[local].port }}
  no switchport
  {{ macros.get_first_ip(local_config.interfaces.fs1a.linknet) }}
 {% include 'includes/l3_interface.j2' %}
@@ -61,7 +61,7 @@ interface {{ local_config.interfaces.fs1a.port }}
 
 ! Linknet to FS1b
 interface {{ local_config.interfaces.fs1b.port }}
- description lnk:{{ config.fs.fs1b.hostname }}:{{ config.fs.fs1b.interfaces[local].port }}
+ description link; {{ config.fs.fs1b.hostname }}; {{ config.fs.fs1b.interfaces[local].port }}
  no switchport
  {{ macros.get_first_ip(local_config.interfaces.fs1b.linknet) }}
 {% include 'includes/l3_interface.j2' %}
@@ -94,7 +94,7 @@ router bgp {{ config.fexit.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.fusion.fusion1.interfaces[local].linknet,
     config.fusion.asn,
-    "eBGP to FUSION1:" + config.fusion.fusion1.hostname + ":" + config.fusion.fusion1.interfaces[local].port + "." + config.fusion.fusion1.interfaces[local].tag + ":" + config.fusion.fusion1.interfaces[local].vrf,
+    "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.fusion.fusion1.interfaces[local].tag + "; " + config.fusion.fusion1.interfaces[local].vrf,
     "Vlan" + config.fusion.fusion1.interfaces[local].tag,
     prefix_list=false
   )}}
@@ -103,7 +103,7 @@ router bgp {{ config.fexit.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.fusion.fusion2.interfaces[local].linknet,
     config.fusion.asn,
-    "eBGP to FUSION2:" + config.fusion.fusion2.hostname + ":" + config.fusion.fusion2.interfaces[local].port + "." + config.fusion.fusion2.interfaces[local].tag + ":" + config.fusion.fusion2.interfaces[local].vrf,
+    "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.fusion.fusion2.interfaces[local].tag + "; " + config.fusion.fusion2.interfaces[local].vrf,
     "Vlan" + config.fusion.fusion2.interfaces[local].tag,
     prefix_list=false
   )}}
@@ -112,7 +112,7 @@ router bgp {{ config.fexit.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fs1a.linknet,
     config.fs.asn,
-    "eBGP to FS1a:" + config.fs.fs1a.hostname + ":" + config.fs.fs1a.interfaces[local].port,
+    "eBGP to FS1a; " + config.fs.fs1a.hostname + "; " + config.fs.fs1a.interfaces[local].port,
     local_config.interfaces.fs1a.port,
     prefix_list=false
   )}}
@@ -121,7 +121,7 @@ router bgp {{ config.fexit.asn }}
   {{ macros.bgp_neighbor_last_ip(
     local_config.interfaces.fs1b.linknet,
     config.fs.asn,
-    "eBGP to FS1b:" + config.fs.fs1b.hostname + ":" + config.fs.fs1b.interfaces[local].port,
+    "eBGP to FS1b; " + config.fs.fs1b.hostname + "; " + config.fs.fs1b.interfaces[local].port,
     local_config.interfaces.fs1b.port,
     prefix_list=false
   )}}

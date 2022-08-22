@@ -9,7 +9,7 @@ snmp-server location {{ local_config.snmp_location }}
 
 ! Linknet to FUSION1
 interface {{ local_config.interfaces.fusion1.port }}
- description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}
+ description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}
  no switchport
  {{ macros.get_last_ip(config.fusion.fusion1.interfaces[local].linknet) }}
 {% include 'includes/l3_interface.j2' %}
@@ -17,7 +17,7 @@ interface {{ local_config.interfaces.fusion1.port }}
 
 ! Linknet to FUSION2
 interface {{ local_config.interfaces.fusion2.port }}
- description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}
+ description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}
  no switchport
  {{ macros.get_last_ip(config.fusion.fusion2.interfaces[local].linknet) }}
 {% include 'includes/l3_interface.j2' %}
@@ -43,7 +43,7 @@ router bgp {{ local_config.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.fusion.fusion1.interfaces[local].linknet,
     config.fusion.asn,
-    "eBGP to FUSION1:" + config.fusion.fusion1.hostname + ":" + config.fusion.fusion1.interfaces[local].port + ":" + config.fusion.fusion1.interfaces[local].vrf,
+    "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "; " + config.fusion.fusion1.interfaces[local].vrf,
     local_config.interfaces.fusion1.port,
     prefix_list=false
   )}}
@@ -52,7 +52,7 @@ router bgp {{ local_config.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.fusion.fusion2.interfaces[local].linknet,
     config.fusion.asn,
-    "eBGP to FUSION2:" + config.fusion.fusion2.hostname + ":" + config.fusion.fusion2.interfaces[local].port + ":" + config.fusion.fusion2.interfaces[local].vrf,
+    "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "; " + config.fusion.fusion2.interfaces[local].vrf,
     local_config.interfaces.fusion2.port,
     prefix_list=false
   )}}

@@ -6,23 +6,23 @@
 ! fix svi + bgp neighbors after dnac has deployed
 {%- for vrf in config.iptransit[local].fusion1 %}
 interface Vlan{{ config.iptransit[local].fusion1[vrf].tag }}
- description lnk:{{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}:{{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
+ description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
 !
 {%- endfor %}
 {%- for vrf in config.iptransit[local].fusion2 %}
 interface Vlan{{ config.iptransit[local].fusion2[vrf].tag }}
- description lnk:{{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}:{{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
+ description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
 !
 {%- endfor %}
 !
 router bgp {{ config.fexit.asn }}
   {{ macros.bgp_neighbor_iptransit_last_ip(
     config.iptransit[local].fusion1.INFRA_VN.linknet,
-    "eBGP to FUSION1: " + config.fusion.fusion1.hostname + ":" + config.fusion.fusion1.interfaces[local].port + "." + config.iptransit[local].fusion1['INFRA_VN'].tag + ":" + macros.get_vrf(config.iptransit[local].fusion1['INFRA_VN'].vrf, vrf),
+    "eBGP to FUSION1;  " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.iptransit[local].fusion1['INFRA_VN'].tag + "; " + macros.get_vrf(config.iptransit[local].fusion1['INFRA_VN'].vrf, vrf),
   )}}
   {{ macros.bgp_neighbor_iptransit_last_ip(
     config.iptransit[local].fusion2.INFRA_VN.linknet,
-    "eBGP to FUSION2: " + config.fusion.fusion2.hostname + ":" + config.fusion.fusion2.interfaces[local].port + "." + config.iptransit[local].fusion2['INFRA_VN'].tag + ":" + macros.get_vrf(config.iptransit[local].fusion2['INFRA_VN'].vrf, vrf),
+    "eBGP to FUSION2;  " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.iptransit[local].fusion2['INFRA_VN'].tag + "; " + macros.get_vrf(config.iptransit[local].fusion2['INFRA_VN'].vrf, vrf),
   )}}
   !
   ! FUSION1
@@ -31,7 +31,7 @@ router bgp {{ config.fexit.asn }}
   address-family ipv4 vrf {{ vrf }}
     maximum-paths {{ config.global.bgp_paths }}
     neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
-    neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} description eBGP to FUSION1: {{ config.fusion.fusion1.hostname }}:{{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}:{{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
+    neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} description eBGP to FUSION1; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
   exit-address-family
   {%- endif %}
 {%- endfor %}
@@ -42,7 +42,7 @@ router bgp {{ config.fexit.asn }}
   address-family ipv4 vrf {{ vrf }}
     maximum-paths {{ config.global.bgp_paths }}
     neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
-    neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} description eBGP to FUSION2: {{ config.fusion.fusion2.hostname }}:{{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}:{{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
+    neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} description eBGP to FUSION2; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
   exit-address-family
   {%- endif %}
 {%- endfor %}

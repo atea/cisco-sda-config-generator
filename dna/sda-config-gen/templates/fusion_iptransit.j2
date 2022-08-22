@@ -6,7 +6,7 @@
 ! Linknet to FEXIT1
 {%- for vrf in config.iptransit.fexit1[local] %}
 interface {{ local_config.interfaces.fexit1.port }}.{{ config.iptransit.fexit1[local][vrf].tag }}
- description lnk:{{ config.fexit.fexit1.hostname }}:Vlan{{ config.iptransit.fexit1[local][vrf].tag }}:{{ vrf }}
+ description link; {{ config.fexit.fexit1.hostname }}; Vlan{{ config.iptransit.fexit1[local][vrf].tag }}; {{ vrf }}
  encapsulation dot1q {{ config.iptransit.fexit1[local][vrf].tag }}
  {%- if config.iptransit.fexit1[local][vrf].vrf is defined %}
  vrf forwarding {{ config.iptransit.fexit1[local][vrf].vrf }}
@@ -21,7 +21,7 @@ interface {{ local_config.interfaces.fexit1.port }}.{{ config.iptransit.fexit1[l
 ! Linknet to FEXIT2
 {%- for vrf in config.iptransit.fexit2[local] %}
 interface {{ local_config.interfaces.fexit2.port }}.{{ config.iptransit.fexit2[local][vrf].tag }}
- description lnk:{{ config.fexit.fexit2.hostname }}:Vlan{{ config.iptransit.fexit2[local][vrf].tag }}:{{ vrf }}
+ description link; {{ config.fexit.fexit2.hostname }}; Vlan{{ config.iptransit.fexit2[local][vrf].tag }}; {{ vrf }}
  encapsulation dot1q {{ config.iptransit.fexit2[local][vrf].tag }}
  {%- if config.iptransit.fexit2[local][vrf].vrf is defined %}
  vrf forwarding {{ config.iptransit.fexit2[local][vrf].vrf }}
@@ -45,7 +45,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.iptransit.fexit1[local][vrf].linknet,
     config.fexit.asn,
-    "eBGP to FEXIT1:" + config.fexit.fexit1.hostname + ":Vlan" + config.iptransit.fexit1[local][vrf].tag + ":" + vrf,
+    "eBGP to FEXIT1; " + config.fexit.fexit1.hostname + "; Vlan" + config.iptransit.fexit1[local][vrf].tag + "; " + vrf,
     local_config.interfaces.fexit1.port + "." + config.iptransit.fexit1[local][vrf].tag,
     prefix_list=true
   )}}
@@ -63,7 +63,7 @@ router bgp {{ config.fusion.asn }}
   {{ macros.bgp_neighbor_first_ip(
     config.iptransit.fexit2[local][vrf].linknet,
     config.fexit.asn,
-    "eBGP to FEXIT1:" + config.fexit.fexit2.hostname + ":Vlan" + config.iptransit.fexit2[local][vrf].tag + ":" + vrf,
+    "eBGP to FEXIT1; " + config.fexit.fexit2.hostname + "; Vlan" + config.iptransit.fexit2[local][vrf].tag + "; " + vrf,
     local_config.interfaces.fexit2.port + "." + config.iptransit.fexit2[local][vrf].tag,
     prefix_list=true
   )}}
