@@ -13,7 +13,7 @@ username {{ user }} privilege 15 secret {{ config.global.users[user] }}
 aaa authorization exec default local
 netconf-yang
 ip ssh ver 2
-crypto key gen rsa mod 2048
+crypto key gen rsa mod 4096
 !
 ! basic snmp, rest pushed via template
 snmp-server view DNAC-ACCESS iso included
