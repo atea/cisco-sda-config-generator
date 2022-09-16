@@ -20,20 +20,20 @@ fusion:
         port: Fo1/0/1
         tag: '200'
         vrf: mgmt_vrf
-        linknet: 10.10.11.0/31
+        linknet4: 10.10.11.0/31
       fexit2:
         port: Fo1/0/2
         tag: '200'
         vrf: mgmt_vrf
-        linknet: 10.10.12.0/31
+        linknet4: 10.10.12.0/31
       tcn1:
         port: Fo1/0/3
         vrf: mgmt_vrf
-        linknet: 10.10.13.0/31
+        linknet4: 10.10.13.0/31
       tcn2:
         port: Fo1/0/4
         vrf: mgmt_vrf
-        linknet: 10.10.14.0/31
+        linknet4: 10.10.14.0/31
   fusion2:
     hostname: fusion2
     interfaces:
@@ -41,26 +41,26 @@ fusion:
         port: Fo1/0/1
         tag: '300'
         vrf: mgmt_vrf
-        linknet: 10.11.11.0/31
+        linknet4: 10.11.11.0/31
       fexit2:
         port: Fo1/0/2
         tag: '300'
         vrf: mgmt_vrf
-        linknet: 10.11.12.0/31
+        linknet4: 10.11.12.0/31
       tcn1:
         port: Fo1/0/3
         vrf: mgmt_vrf
-        linknet: 10.11.13.0/31
+        linknet4: 10.11.13.0/31
       tcn2:
         port: Fo1/0/4
         vrf: mgmt_vrf
-        linknet: 10.11.14.0/31
+        linknet4: 10.11.14.0/31
 
 tcn:
   tcn1:
     hostname: tcn1
     snmp_location: 'secret lair'
-    ip: '10.12.12.0'
+    ipv4: '10.12.12.0'
     asn: '65001'
     interfaces:
       fusion1:
@@ -70,7 +70,7 @@ tcn:
   tcn2:
     hostname: tcn2
     snmp_location: 'secret lair'
-    ip: '10.13.13.0'
+    ipv4: '10.13.13.0'
     asn: '65002'
     interfaces:
       fusion1:
@@ -83,7 +83,7 @@ fexit:
   fexit1:
     hostname: fexit1
     snmp_location: 'ultra secret lair'
-    ip: '10.13.13.0'
+    ipv4: '10.13.13.0'
     interfaces:
       fusion1: &fusion1
         port: Fo1/0/1
@@ -95,17 +95,17 @@ fexit:
         allowed: 300-399
       fexit: &fexit
         port: Fo1/0/3
-        linknet: 10.13.1.0/31
+        linknet4: 10.13.1.0/31
       fs1a:
         port: Fo1/0/4
-        linknet: 10.13.2.0/31
+        linknet4: 10.13.2.0/31
       fs1b:
         port: Fo1/0/5
-        linknet: 10.13.3.0/31
+        linknet4: 10.13.3.0/31
   fexit2:
     hostname: fexit2
     snmp_location: 'ultra secret lair'
-    ip: '10.14.14.0'
+    ipv4: '10.14.14.0'
     interfaces:
       fusion1:
         <<: *fusion1
@@ -118,17 +118,17 @@ fexit:
         port: Fo1/0/3
       fs1a:
         port: Fo1/0/4
-        linknet: 10.14.1.0/31
+        linknet4: 10.14.1.0/31
       fs1b:
         port: Fo1/0/5
-        linknet: 10.14.2.0/31
+        linknet4: 10.14.2.0/31
 
 fs:
   asn: '65004'
   fs1a:
     hostname: fs1a
     snmp_location: 'omegalulz secret'
-    ip: '10.15.15.0'
+    ipv4: '10.15.15.0'
     interfaces:
       fexit1:
         port: Fo1/0/1
@@ -136,11 +136,11 @@ fs:
         port: Fo2/0/1
       fs: &fs
         port: Fo1/0/2
-        linknet: 10.15.1.0/31
+        linknet4: 10.15.1.0/31
   fs1b:
     hostname: fs1b
     snmp_location: 'omegalulz secret'
-    ip: '10.16.16.0'
+    ipv4: '10.16.16.0'
     interfaces:
       fexit1:
         port: Fo1/0/1
@@ -155,65 +155,65 @@ iptransit:
     fusion1:
       INFRA_VN:
         tag: '401'
-        linknet: 10.99.10.0/30
+        linknet4: 10.99.10.0/30
         vrf: mgmt_vrf
       fallback:
         tag: '402'
-        linknet: 10.99.10.4/30
+        linknet4: 10.99.10.4/30
         vrf: fallback_vrf
       guest:
         tag: '403'
-        linknet: 10.99.10.8/30
+        linknet4: 10.99.10.8/30
         vrf: guest_vrf
       iot:
         tag: '404'
-        linknet: 10.99.10.12/30
+        linknet4: 10.99.10.12/30
     fusion2:
       INFRA_VN:
         tag: '501'
-        linknet: 10.99.10.16/30
+        linknet4: 10.99.10.16/30
         vrf: mgmt_vrf
       fallback:
         tag: '502'
-        linknet: 10.99.10.20/30
+        linknet4: 10.99.10.20/30
         vrf: fallback_vrf
       guest:
         tag: '503'
-        linknet: 10.99.10.24/30
+        linknet4: 10.99.10.24/30
         vrf: guest_vrf
       iot:
         tag: '504'
-        linknet: 10.99.10.28/30
+        linknet4: 10.99.10.28/30
   fexit2:
     fusion1:
       INFRA_VN:
         tag: '401'
-        linknet: 10.99.20.0/30
+        linknet4: 10.99.20.0/30
         vrf: mgmt_vrf
       fallback:
         tag: '402'
-        linknet: 10.99.20.4/30
+        linknet4: 10.99.20.4/30
         vrf: fallback_vrf
       guest:
         tag: '403'
-        linknet: 10.99.20.8/30
+        linknet4: 10.99.20.8/30
         vrf: guest_vrf
       iot:
         tag: '404'
-        linknet: 10.99.20.12/30
+        linknet4: 10.99.20.12/30
     fusion2:
       INFRA_VN:
         tag: '501'
-        linknet: 10.99.20.16/30
+        linknet4: 10.99.20.16/30
         vrf: mgmt_vrf
       fallback:
         tag: '502'
-        linknet: 10.99.20.20/30
+        linknet4: 10.99.20.20/30
         vrf: fallback_vrf
       guest:
         tag: '503'
-        linknet: 19.99.20.24/30
+        linknet4: 19.99.20.24/30
         vrf: guest_vrf
       iot:
         tag: '504'
-        linknet: 10.99.20.28/30
+        linknet4: 10.99.20.28/30
