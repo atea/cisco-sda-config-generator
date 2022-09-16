@@ -6,6 +6,9 @@
 hostname {{ local_config.hostname }}
 ip domain name {{ config.global.domain }}
 snmp-server location {{ local_config.snmp_location }}
+!
+{% include 'includes/vtp.j2' %}
+!
 
 ! Linknet to FUSION1
 interface {{ local_config.interfaces.fusion1.port }}
