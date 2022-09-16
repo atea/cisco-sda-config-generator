@@ -5,45 +5,51 @@
 
 ! fix svi + bgp neighbors after dnac has deployed
 {%- for vrf in config.iptransit[local].fusion1 %}
+vlan {{ config.iptransit[local].fusion1[vrf].tag }}
+ name link_{{ config.fusion.fusion1.hostname }}_{{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
+!
 interface Vlan{{ config.iptransit[local].fusion1[vrf].tag }}
  description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
 !
 {%- endfor %}
 {%- for vrf in config.iptransit[local].fusion2 %}
+vlan {{ config.iptransit[local].fusion2[vrf].tag }}
+ name link_{{ config.fusion.fusion2.hostname }}_{{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
+!
 interface Vlan{{ config.iptransit[local].fusion2[vrf].tag }}
  description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
 !
 {%- endfor %}
 !
 router bgp {{ config.fexit.asn }}
-  {{ macros.bgp_neighbor_iptransit_last_ip(
-    config.iptransit[local].fusion1.INFRA_VN.linknet,
-    "eBGP to FUSION1;  " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.iptransit[local].fusion1['INFRA_VN'].tag + "; " + macros.get_vrf(config.iptransit[local].fusion1['INFRA_VN'].vrf, vrf),
-  )}}
-  {{ macros.bgp_neighbor_iptransit_last_ip(
-    config.iptransit[local].fusion2.INFRA_VN.linknet,
-    "eBGP to FUSION2;  " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.iptransit[local].fusion2['INFRA_VN'].tag + "; " + macros.get_vrf(config.iptransit[local].fusion2['INFRA_VN'].vrf, vrf),
-  )}}
-  !
   ! FUSION1
 {%- for vrf in config.iptransit[local].fusion1 %}
- {%- if vrf != 'INFRA_VN' %}
-  address-family ipv4 vrf {{ vrf }}
-    maximum-paths {{ config.global.bgp_paths }}
-    neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
-    neighbor {{ config.iptransit[local].fusion1[vrf].linknet | last_ip }} description eBGP to FUSION1; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
-  exit-address-family
+  {%- set local_vrf_name = macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf, border=true, grt_as_null=true) %}
+  {%- set peer_vrf_name = macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf, border=false, grt_as_null=false) %}
+  {%- if local_vrf_name == 'None' %}
+  {%- set local_vrf_name = none -%}
   {%- endif %}
+  {{ macros.bgp_neighbor_iptransit_last_ip(
+    config.iptransit[local].fusion1[vrf].linknet4,
+    config.iptransit[local].fusion1[vrf].linknet6 | default(none),
+    local_vrf_name,
+    "eBGP to FUSION1;  " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.iptransit[local].fusion1[vrf].tag + "; " + peer_vrf_name,
+    config.global.bgp_paths
+  )}}
 {%- endfor %}
-  !
-  ! FUSION 2
+ !
+ ! FUSION2
 {%- for vrf in config.iptransit[local].fusion2 %}
- {%- if vrf != 'INFRA_VN' %}
-  address-family ipv4 vrf {{ vrf }}
-    maximum-paths {{ config.global.bgp_paths }}
-    neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} inherit peer-session BGP-SDA
-    neighbor {{ config.iptransit[local].fusion2[vrf].linknet | last_ip }} description eBGP to FUSION2; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.iptransit[local].fusion2[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf) }}
-  exit-address-family
+  {%- set local_vrf_name = macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf, border=true, grt_as_null=true) %}
+  {%- set peer_vrf_name = macros.get_vrf(config.iptransit[local].fusion2[vrf].vrf, vrf, border=false, grt_as_null=false) %}
+  {%- if local_vrf_name == 'None' %}
+  {%- set local_vrf_name = none -%}
   {%- endif %}
+  {{ macros.bgp_neighbor_iptransit_last_ip(
+    config.iptransit[local].fusion2[vrf].linknet4,
+    config.iptransit[local].fusion2[vrf].linknet6 | default(none),
+    local_vrf_name,
+    "eBGP to FUSION2;  " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.iptransit[local].fusion2[vrf].tag + "; " + peer_vrf_name,
+    config.global.bgp_paths
+  )}}
 {%- endfor %}
-!

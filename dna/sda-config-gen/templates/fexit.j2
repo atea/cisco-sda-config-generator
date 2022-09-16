@@ -17,12 +17,15 @@ interface {{ local_config.interfaces.fusion1.port }}
  switchport trunk native vlan {{ local_config.interfaces.fusion1.native }}
 !
 vlan {{ config.fusion.fusion1.interfaces[local].tag }}
- name link; {{ config.fusion.fusion1.hostname }}_mgmt
+ name link_{{ config.fusion.fusion1.hostname }}_{{ config.fusion.fusion1.interfaces[local].vrf | default('GRT') }}
 !
 interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
- description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.fusion.fusion1.interfaces[local].tag }}; {{ config.fusion.fusion1.interfaces[local].vrf }}
- {{ macros.get_last_ip(config.fusion.fusion1.interfaces[local].linknet) }}
-{% include 'includes/l3_interface.j2' %}
+ description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.fusion.fusion1.interfaces[local].tag }}; {{ config.fusion.fusion1.interfaces[local].vrf | default('GRT') }}
+ {{ macros.get_interface_ip_last(
+  local_config.interfaces.fusion1.vrf | default(none),
+  config.fusion.fusion1.interfaces[local].linknet4,
+  config.fusion.fusion1.interfaces[local].linknet6 | default(none)
+ )}}
 !
 
 ! Linknet to FUSION2
@@ -32,47 +35,66 @@ interface {{ local_config.interfaces.fusion2.port }}
  switchport trunk native vlan {{ local_config.interfaces.fusion2.native }}
 !
 vlan {{ config.fusion.fusion2.interfaces[local].tag }}
- name link; {{ config.fusion.fusion2.hostname }}_mgmt
+ name link_{{ config.fusion.fusion2.hostname }}_{{ config.fusion.fusion2.interfaces[local].vrf | default('GRT') }}
 !
 interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
- description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.fusion.fusion2.interfaces[local].tag }}; {{ config.fusion.fusion2.interfaces[local].vrf }}
- {{ macros.get_last_ip(config.fusion.fusion2.interfaces[local].linknet) }}
-{% include 'includes/l3_interface.j2' %}
+ description link; {{ config.fusion.fusion2.hostname }}; {{ config.fusion.fusion2.interfaces[local].port }}.{{ config.fusion.fusion2.interfaces[local].tag }}; {{ config.fusion.fusion2.interfaces[local].vrf | default('GRT') }}
+ {{ macros.get_interface_ip_last(
+  local_config.interfaces.fusion2.vrf | default(none),
+  config.fusion.fusion2.interfaces[local].linknet4,
+  config.fusion.fusion2.interfaces[local].linknet6 | default(none)
+ )}}
 !
 
 ! Linknet between FEXIT1 and FEXIT2
 interface {{ local_config.interfaces.fexit.port }}
- description link; {{ config.fexit[peer].hostname }}; {{ config.fexit[peer].interfaces.fexit.port }}
+ description link; {{ config.fexit[peer].hostname }}; {{ config.fexit[peer].interfaces.fexit.port }}; {{ config.fexit[peer].vrf | default('GRT') }}
  no switchport
  {%- if local.endswith('1') or local.endswith('a') %}
- {{ macros.get_first_ip(local_config.interfaces.fexit.linknet) }}
+ {{ macros.get_interface_ip_first(
+  local_config.interfaces.fexit.vrf | default(none),
+  local_config.interfaces.fexit.linknet4,
+  local_config.interfaces.fexit.linknet6 | default(none)
+ )}}
  {%- else %}
- {{ macros.get_last_ip(local_config.interfaces.fexit.linknet) }}
+ {{ macros.get_interface_ip_last(
+  local_config.interfaces.fexit.vrf | default(none),
+  local_config.interfaces.fexit.linknet4,
+  local_config.interfaces.fexit.linknet6 | default(none)
+ )}}
  {%- endif %}
-{% include 'includes/l3_interface.j2' %}
  ip router isis 
  isis network point-to-point 
 !
 
 ! Linknet to FS1a
 interface {{ local_config.interfaces.fs1a.port }}
- description link; {{ config.fs.fs1a.hostname }}; {{ config.fs.fs1a.interfaces[local].port }}
+ description link; {{ config.fs.fs1a.hostname }}; {{ config.fs.fs1a.interfaces[local].port }}; {{ config.fs.fs1a.interfaces[local].vrf | default('GRT') }}
  no switchport
- {{ macros.get_first_ip(local_config.interfaces.fs1a.linknet) }}
-{% include 'includes/l3_interface.j2' %}
+ {{ macros.get_interface_ip_first(
+  local_config.interfaces.fs1a.vrf | default(none),
+  local_config.interfaces.fs1a.linknet4,
+  local_config.interfaces.fs1a.linknet6 | default(none)
+ )}}
 !
 
 ! Linknet to FS1b
 interface {{ local_config.interfaces.fs1b.port }}
- description link; {{ config.fs.fs1b.hostname }}; {{ config.fs.fs1b.interfaces[local].port }}
+ description link; {{ config.fs.fs1b.hostname }}; {{ config.fs.fs1b.interfaces[local].port }}; {{ config.fs.fs1b.interfaces[local].vrf | default('GRT') }}
  no switchport
- {{ macros.get_first_ip(local_config.interfaces.fs1b.linknet) }}
-{% include 'includes/l3_interface.j2' %}
+ {{ macros.get_interface_ip_first(
+  local_config.interfaces.fs1b.vrf | default(none),
+  local_config.interfaces.fs1b.linknet4,
+  local_config.interfaces.fs1b.linknet6 | default(none)
+ )}}
 !
 
 ! Loopback
 interface Lo0
- ip address {{ local_config.ip }} 255.255.255.255
+ ip address {{ local_config.ipv4 }} 255.255.255.255
+ {%- if local_config.ipv6 is defined %}
+ ipv6 address {{ local_config.ipv6 }}/128
+ {%- endif %}
  no shutdown
  ip pim sparse-mode
  ip router isis 
@@ -90,44 +112,65 @@ router bgp {{ config.fexit.asn }}
  !
  address-family ipv4
   maximum-paths {{ config.global.bgp_paths }}
-  network {{ local_config.ip }} mask 255.255.255.255
-  network {{ local_config.interfaces.fexit.linknet | network }} mask {{ local_config.interfaces.fexit.linknet | netmask }}
-  !
-  ! FUSION1
-  {{ macros.bgp_neighbor_first_ip(
-    config.fusion.fusion1.interfaces[local].linknet,
-    config.fusion.asn,
-    "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.fusion.fusion1.interfaces[local].tag + "; " + config.fusion.fusion1.interfaces[local].vrf,
-    "Vlan" + config.fusion.fusion1.interfaces[local].tag,
-    prefix_list=false
-  )}}
-  !
-  ! FUSION2
-  {{ macros.bgp_neighbor_first_ip(
-    config.fusion.fusion2.interfaces[local].linknet,
-    config.fusion.asn,
-    "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.fusion.fusion2.interfaces[local].tag + "; " + config.fusion.fusion2.interfaces[local].vrf,
-    "Vlan" + config.fusion.fusion2.interfaces[local].tag,
-    prefix_list=false
-  )}}
-  !
-  ! FS1a
-  {{ macros.bgp_neighbor_last_ip(
-    local_config.interfaces.fs1a.linknet,
-    config.fs.asn,
-    "eBGP to FS1a; " + config.fs.fs1a.hostname + "; " + config.fs.fs1a.interfaces[local].port,
-    local_config.interfaces.fs1a.port,
-    prefix_list=false
-  )}}
-  !
-  ! FS1b
-  {{ macros.bgp_neighbor_last_ip(
-    local_config.interfaces.fs1b.linknet,
-    config.fs.asn,
-    "eBGP to FS1b; " + config.fs.fs1b.hostname + "; " + config.fs.fs1b.interfaces[local].port,
-    local_config.interfaces.fs1b.port,
-    prefix_list=false
-  )}}
- !
+  network {{ local_config.ipv4 }} mask 255.255.255.255
+  network {{ local_config.interfaces.fexit.linknet4 | network }} mask {{ local_config.interfaces.fexit.linknet4 | netmask }}
  exit-address-family
+ {%- if local_config.ipv6 is defined %}
+ address-family ipv6
+  maximum-paths {{ config.global.bgp_paths }}
+  network {{ local_config.ipv6 }}/128
+  {%- if local_config.interfaces.fexit.linknet6 is defined %}
+  network {{ local_config.interfaces.fexit.linknet6 }}
+  {%- endif %}
+ exit-address-family
+ {%- endif %}
+ !
+ ! FUSION1
+ {{ macros.bgp_neighbor_first_ip(
+   config.fusion.fusion1.interfaces[local].linknet4,
+   config.fusion.fusion1.interfaces[local].linknet6 | default(none),
+   local_config.interfaces.fusion1.vrf | default(none),
+   config.fusion.asn,
+   "Vlan" + config.fusion.fusion1.interfaces[local].tag,
+   deny_default | default(false),
+   "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.fusion.fusion1.interfaces[local].tag + "; " + config.fusion.fusion1.interfaces[local].vrf | default('GRT'),
+   config.global.bgp_paths
+ )}}
+ !
+ ! FUSION2
+ {{ macros.bgp_neighbor_first_ip(
+   config.fusion.fusion2.interfaces[local].linknet4,
+   config.fusion.fusion2.interfaces[local].linknet6 | default(none),
+   local_config.interfaces.fusion2.vrf | default(none),
+   config.fusion.asn,
+   "Vlan" + config.fusion.fusion2.interfaces[local].tag,
+   deny_default | default(false),
+   "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.fusion.fusion2.interfaces[local].tag + "; " + config.fusion.fusion2.interfaces[local].vrf | default('GRT'),
+   config.global.bgp_paths
+ )}}
+ !
+ ! FS1a
+ {{ macros.bgp_neighbor_first_ip(
+   local_config.interfaces.fs1a.linknet4,
+   local_config.interfaces.fs1a.linknet6 | default(none),
+   local_config.interfaces.fs1a.vrf | default(none),
+   config.fs.asn,
+   local_config.interfaces.fs1a.port,
+   deny_default | default(false),
+   "eBGP to FS1a; " + config.fs.fs1a.hostname + "; " + config.fs.fs1a.interfaces[local].port + "; " + config.fs.fs1a.interfaces[local].vrf | default('GRT'),
+   config.global.bgp_paths
+ )}}
+ !
+ ! FS1b
+ {{ macros.bgp_neighbor_first_ip(
+   local_config.interfaces.fs1b.linknet4,
+   local_config.interfaces.fs1b.linknet6 | default(none),
+   local_config.interfaces.fs1b.vrf | default(none),
+   config.fs.asn,
+   local_config.interfaces.fs1b.port,
+   deny_default | default(false),
+   "eBGP to FS1b; " + config.fs.fs1b.hostname + "; " + config.fs.fs1b.interfaces[local].port + "; " + config.fs.fs1b.interfaces[local].vrf | default('GRT'),
+   config.global.bgp_paths
+ )}}
+ !
 !
