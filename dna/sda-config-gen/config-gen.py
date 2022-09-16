@@ -36,7 +36,20 @@ def get_first_ip(network):
   return list(ipaddress.ip_network(network).hosts())[0]
 
 def get_last_ip(network):
-  return list(ipaddress.ip_network(network).hosts())[-1]
+  return list(ipaddress.ip_network(network).hosts())[1]
+
+def get_first_ip_with_prefix(network):
+  prefix = ipaddress.ip_network(network).prefixlen
+  ip = get_first_ip(network)
+  return(str(ip) + '/' + str(prefix))
+
+def get_last_ip_with_prefix(network):
+  prefix = ipaddress.ip_network(network).prefixlen
+  ip = get_last_ip(network)
+  return(str(ip) + '/' + str(prefix))
+
+def get_ip_version(network):
+  return ipaddress.ip_network(network).version
 
 # prepare templates & filters
 file_loader = FileSystemLoader('templates')
@@ -45,6 +58,9 @@ env.filters['netmask'] = get_netmask
 env.filters['network'] = get_network
 env.filters['first_ip'] = get_first_ip
 env.filters['last_ip'] = get_last_ip
+env.filters['first_ip_prefix'] = get_first_ip_with_prefix
+env.filters['last_ip_prefix'] = get_last_ip_with_prefix
+env.filters['ip_version'] = get_ip_version
 
 # generate fusion1 + fusion2
 generate_config(env, 'fusion', 'fusion1')
