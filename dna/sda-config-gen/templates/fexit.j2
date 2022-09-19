@@ -47,25 +47,27 @@ interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
 !
 
 ! Linknet between FEXIT1 and FEXIT2
-interface {{ local_config.interfaces.fexit.port }}
- description link; {{ config.fexit[peer].hostname }}; {{ config.fexit[peer].interfaces.fexit.port }}; {{ config.fexit[peer].vrf | default('GRT') }}
+{%- for link in local_config.interfaces.fexit %}
+interface {{ local_config.interfaces.fexit[link].port[local] }}
+ description link; {{ config.fexit[peer].hostname }}; {{ config.fexit[peer].interfaces.fexit[link].port[peer] }}; {{ config.fexit[peer].interfaces.fexit.vrf | default('GRT') }}
  no switchport
  {%- if local.endswith('1') or local.endswith('a') %}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fexit.vrf | default(none),
-  local_config.interfaces.fexit.linknet4,
-  local_config.interfaces.fexit.linknet6 | default(none)
+  local_config.interfaces.fexit[link].linknet4,
+  local_config.interfaces.fexit[link].linknet6 | default(none)
  )}}
  {%- else %}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit.vrf | default(none),
-  local_config.interfaces.fexit.linknet4,
-  local_config.interfaces.fexit.linknet6 | default(none)
+  local_config.interfaces.fexit[link].linknet4,
+  local_config.interfaces.fexit[link].linknet6 | default(none)
  )}}
  {%- endif %}
  ip router isis 
  isis network point-to-point 
 !
+{%- endfor %}
 
 ! Linknet to FS1a
 interface {{ local_config.interfaces.fs1a.port }}
@@ -113,15 +115,19 @@ router bgp {{ config.fexit.asn }}
  address-family ipv4
   maximum-paths {{ config.global.bgp_paths }}
   network {{ local_config.ipv4 }} mask 255.255.255.255
-  network {{ local_config.interfaces.fexit.linknet4 | network }} mask {{ local_config.interfaces.fexit.linknet4 | netmask }}
+  {%- for link in local_config.interfaces.fexit %}
+  network {{ local_config.interfaces.fexit[link].linknet4 | network }} mask {{ local_config.interfaces.fexit[link].linknet4 | netmask }}
+  {%- endfor %}
  exit-address-family
  {%- if local_config.ipv6 is defined %}
  address-family ipv6
   maximum-paths {{ config.global.bgp_paths }}
   network {{ local_config.ipv6 }}/128
-  {%- if local_config.interfaces.fexit.linknet6 is defined %}
-  network {{ local_config.interfaces.fexit.linknet6 }}
+  {%- for link in local_config.interfaces.fexit %}
+  {%- if local_config.interfaces.fexit[link].linknet6 is defined %}
+  network {{ local_config.interfaces.fexit[link].linknet6 }}
   {%- endif %}
+  {%- endfor %}
  exit-address-family
  {%- endif %}
  !

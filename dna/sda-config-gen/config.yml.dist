@@ -86,14 +86,22 @@ fexit:
         native: '999'
         allowed: 300-399
       fexit: &fexit
-        port: Fo1/0/3
-        linknet4: 10.13.1.0/31
+        port1:
+          port:
+            fexit1: Fo1/0/3
+            fexit2: Fo1/0/3
+          linknet4: 10.13.1.0/31
+        port2:
+          port:
+            fexit1: Fo1/0/4
+            fexit2: Fo1/0/4
+          linknet4: 10.13.2.0/31
       fs1a:
-        port: Fo1/0/4
-        linknet4: 10.13.2.0/31
-      fs1b:
         port: Fo1/0/5
         linknet4: 10.13.3.0/31
+      fs1b:
+        port: Fo1/0/6
+        linknet4: 10.13.4.0/31
   fexit2:
     hostname: fexit2
     snmp_location: 'ultra secret lair'
@@ -107,7 +115,6 @@ fexit:
         port: Fo1/0/2
       fexit:
         <<: *fexit
-        port: Fo1/0/3
       fs1a:
         port: Fo1/0/4
         linknet4: 10.14.1.0/31
