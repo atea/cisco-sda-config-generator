@@ -10,6 +10,7 @@ vlan {{ config.iptransit[local].fusion1[vrf].tag }}
 !
 interface Vlan{{ config.iptransit[local].fusion1[vrf].tag }}
  description link; {{ config.fusion.fusion1.hostname }}; {{ config.fusion.fusion1.interfaces[local].port }}.{{ config.iptransit[local].fusion1[vrf].tag }}; {{ macros.get_vrf(config.iptransit[local].fusion1[vrf].vrf, vrf) }}
+ bfd interval 250 min_rx 250 multiplier 3
 !
 {%- endfor %}
 {%- for vrf in config.iptransit[local].fusion2 %}
