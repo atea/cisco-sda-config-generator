@@ -80,8 +80,6 @@
  {%- set neighbor = linknet | last_ip %}
  {%- endif %}
   maximum-paths {{ bgp_paths }}
-  neighbor {{ neighbor }} inherit peer-session BGP-SDA
-  neighbor {{ neighbor }} description {{ description }}
   {%- if not desc_and_inherit_only %}
   {%- if linknet|ip_version == 6 %}
   !
@@ -97,6 +95,8 @@
   {%- endif %}
   neighbor {{ neighbor }} activate
   {%- endif %}
+  neighbor {{ neighbor }} inherit peer-session BGP-SDA
+  neighbor {{ neighbor }} description {{ description }}
 {%- endmacro -%}
 
 {%- macro bgp_neighbor_iptransit_first_ip(linknet4, linknet6, vrf, description, bgp_paths) -%}
