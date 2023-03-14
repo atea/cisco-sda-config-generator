@@ -10,7 +10,10 @@ def yaml_from_file(file):
     return yaml.safe_load(f)
 
 work_dir = os.path.dirname(os.path.realpath(__file__))
-config_file = work_dir + '/config.yml'
+project = 'projectx'
+config_file = work_dir + '/config_' + project + '.yml'
+generated_config_dir = work_dir + '/generated-configs/' + project
+os.mkdir(generated_config_dir)
 config = yaml_from_file(config_file)
 
 def generate_config(env, template, local, peer=None):
@@ -19,7 +22,7 @@ def generate_config(env, template, local, peer=None):
   save_config(work_dir, template + '_' + local, d)
 
 def save_config(work_dir, hostname, data):
-  full_path = work_dir + '/generated-configs/' + hostname + '.txt'
+  full_path = generated_config_dir + '/' + hostname + '.txt'
   save_to_file(full_path, data)
 
 def save_to_file(filename, data):
