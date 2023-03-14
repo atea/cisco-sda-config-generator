@@ -13,6 +13,7 @@ work_dir = os.path.dirname(os.path.realpath(__file__))
 project = 'projectx'
 config_file = work_dir + '/config_' + project + '.yml'
 generated_config_dir = work_dir + '/generated-configs/' + project
+if not os.path.exists(generated_config_dir):
 os.mkdir(generated_config_dir)
 config = yaml_from_file(config_file)
 
