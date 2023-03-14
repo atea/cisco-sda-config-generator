@@ -19,40 +19,57 @@ fusion:
       fexit1:
         port: Fo1/0/1
         tag: '200'
+        vrf: mgmt_vrf
         linknet4: 10.10.11.0/31
+        linknet6: fd00::10:10:11:0/127
       fexit2:
         port: Fo1/0/2
         tag: '200'
+        vrf: mgmt_vrf
         linknet4: 10.10.12.0/31
+        linknet6: fd00::10:10:12:0/127
       tcn1:
         port: Fo1/0/3
+        vrf: mgmt_vrf
         linknet4: 10.10.13.0/31
+        linknet6: fd00::10:10:13:0/127        
       tcn2:
         port: Fo1/0/4
+        vrf: mgmt_vrf
         linknet4: 10.10.14.0/31
+        linknet6: fd00::10:10:14:0/127
   fusion2:
     hostname: fusion2
     interfaces:
       fexit1:
         port: Fo1/0/1
         tag: '300'
+        vrf: mgmt_vrf
         linknet4: 10.11.11.0/31
+        linknet6: fd00::10:11:11:0/127
       fexit2:
         port: Fo1/0/2
         tag: '300'
+        vrf: mgmt_vrf
         linknet4: 10.11.12.0/31
+        linknet6: fd00::10:11:12:0/127
       tcn1:
         port: Fo1/0/3
+        vrf: mgmt_vrf
         linknet4: 10.11.13.0/31
+        linknet6: fd00::10:11:13:0/127
       tcn2:
         port: Fo1/0/4
+        vrf: mgmt_vrf
         linknet4: 10.11.14.0/31
+        linknet6: fd00::10:11:14:0/127
 
 tcn:
   tcn1:
     hostname: tcn1
     snmp_location: 'secret lair'
     ipv4: '10.12.12.0'
+    ipv6: 'fd00::10:12:12:0'
     asn: '65001'
     interfaces:
       fusion1:
@@ -63,6 +80,7 @@ tcn:
     hostname: tcn2
     snmp_location: 'secret lair'
     ipv4: '10.13.13.0'
+    ipv6: 'fd00::10:13:13:0'
     asn: '65002'
     interfaces:
       fusion1:
@@ -75,37 +93,39 @@ fexit:
   fexit1:
     hostname: fexit1
     snmp_location: 'ultra secret lair'
-    ipv4: '10.13.13.0'
+    ipv4: '10.14.14.0'
+    ipv6: 'fd00::10:14:14:0'
     interfaces:
       fusion1: &fusion1
         port: Fo1/0/1
         native: '999'
-        allowed: 200-299
       fusion2: &fusion2
         port: Fo1/0/2
         native: '999'
-        allowed: 300-399
       fexit: &fexit
         port1:
           port:
             fexit1: Fo1/0/3
             fexit2: Fo1/0/3
-          linknet4: 10.13.1.0/31
+          linknet4: 10.14.1.0/31
+          linknet6: fd00::10:14:1:0/127
         port2:
           port:
             fexit1: Fo1/0/4
             fexit2: Fo1/0/4
-          linknet4: 10.13.2.0/31
+          linknet4: 10.14.2.0/31
+          linknet6: fd00::10:14:2:0/127
       fs1a:
         port: Fo1/0/5
-        linknet4: 10.13.3.0/31
+        linknet4: 10.14.3.0/31
       fs1b:
         port: Fo1/0/6
-        linknet4: 10.13.4.0/31
+        linknet4: 10.14.4.0/31
   fexit2:
     hostname: fexit2
     snmp_location: 'ultra secret lair'
-    ipv4: '10.14.14.0'
+    ipv4: '10.15.15.0'
+    ipv6: 'fd00::10:15:15:0'
     interfaces:
       fusion1:
         <<: *fusion1
@@ -117,10 +137,10 @@ fexit:
         <<: *fexit
       fs1a:
         port: Fo1/0/4
-        linknet4: 10.14.1.0/31
+        linknet4: 10.15.1.0/31
       fs1b:
         port: Fo1/0/5
-        linknet4: 10.14.2.0/31
+        linknet4: 10.15.2.0/31
 
 fs:
   asn: '65004'
@@ -155,60 +175,76 @@ iptransit:
       INFRA_VN:
         tag: '401'
         linknet4: 10.99.10.0/30
+        linknet6: fd00::10:99:10:0/126
       fallback:
         tag: '402'
         linknet4: 10.99.10.4/30
+        linknet6: fd00::10:99:10:4/126
         vrf: fallback_vrf
       guest:
         tag: '403'
         linknet4: 10.99.10.8/30
+        linknet6: fd00::10:99:10:8/126
         vrf: guest_vrf
       iot:
         tag: '404'
         linknet4: 10.99.10.12/30
+        linknet6: fd00::10:99:10:c/126
     fusion2:
       INFRA_VN:
         tag: '501'
         linknet4: 10.99.10.16/30
+        linknet6: fd00::10:99:10:10/126
       fallback:
         tag: '502'
         linknet4: 10.99.10.20/30
+        linknet6: fd00::10:99:10:14/126
         vrf: fallback_vrf
       guest:
         tag: '503'
         linknet4: 10.99.10.24/30
+        linknet6: fd00::10:99:10:18/126
         vrf: guest_vrf
       iot:
         tag: '504'
         linknet4: 10.99.10.28/30
+        linknet6: fd00::10:99:10:1c/126
   fexit2:
     fusion1:
       INFRA_VN:
         tag: '401'
         linknet4: 10.99.20.0/30
+        linknet6: fd00::10:99:20:0/126
       fallback:
         tag: '402'
         linknet4: 10.99.20.4/30
+        linknet6: fd00::10:99:20:4/126
         vrf: fallback_vrf
       guest:
         tag: '403'
         linknet4: 10.99.20.8/30
+        linknet6: fd00::10:99:20:8/126
         vrf: guest_vrf
       iot:
         tag: '404'
         linknet4: 10.99.20.12/30
+        linknet6: fd00::10:99:20:c/126
     fusion2:
       INFRA_VN:
         tag: '501'
         linknet4: 10.99.20.16/30
+        linknet6: fd00::10:99:20:10/126
       fallback:
         tag: '502'
         linknet4: 10.99.20.20/30
+        linknet6: fd00::10:99:20:14/126
         vrf: fallback_vrf
       guest:
         tag: '503'
         linknet4: 19.99.20.24/30
+        linknet6: fd00::10:99:20:18/126
         vrf: guest_vrf
       iot:
         tag: '504'
         linknet4: 10.99.20.28/30
+        linknet6: fd00::10:99:20:1c/126

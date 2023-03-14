@@ -44,7 +44,7 @@ The following is assumed;
  * Clone this repo
  * Optional: initialize virtual environment
  * Install requirements
- * Copy `config.yml.dist` to `config.yml` and update with desired values
+ * Copy `config_projectx.yml.dist` to `config_projectx.yml` and update with desired values
  * Run script
  * Profit???
 
@@ -54,6 +54,6 @@ cd cisco/dna/sda-config-gen
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp config.yml.dist config.yml
+cp config_projectx.yml.dist config_projectx.yml
 python config-gen.py
 ```
