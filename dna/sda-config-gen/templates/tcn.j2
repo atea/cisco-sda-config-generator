@@ -26,14 +26,13 @@ interface {{ local_config.interfaces.fusion1.port }}
 {%- if 'fexit1' in local_config.interfaces %}
 ! Linknet to FEXIT1
 interface {{ local_config.interfaces.fexit1.port }}
-description link; {{ config.fexit.fexit1.hostname }}; {{ config.fexit.fexit1.interfaces[local].port }}; {{
-config.fexit.fexit1.interfaces[local].vrf | default('GRT') }}
-no switchport
-{{ macros.get_interface_ip_last(
-local_config.interfaces.fexit1.vrf | default(none),
-config.fexit.fexit1.interfaces[local].linknet4,
-config.fexit.fexit1.interfaces[local].linknet6 | default(none)
-)}}
+ description link; {{ config.fexit.fexit1.hostname }}; {{ config.fexit.fexit1.interfaces[local].port }}; {{ config.fexit.fexit1.interfaces[local].vrf | default('GRT') }}
+ no switchport
+ {{ macros.get_interface_ip_last(
+  local_config.interfaces.fexit1.vrf | default(none),
+  config.fexit.fexit1.interfaces[local].linknet4,
+  config.fexit.fexit1.interfaces[local].linknet6 | default(none)
+ )}}
 !
 {%- endif %}
 
@@ -53,14 +52,13 @@ interface {{ local_config.interfaces.fusion2.port }}
 {%- if 'fexit2' in local_config.interfaces %}
 ! Linknet to FEXIT2
 interface {{ local_config.interfaces.fexit2.port }}
-description link; {{ config.fexit.fexit2.hostname }}; {{ config.fexit.fexit2.interfaces[local].port }}; {{
-config.fexit.fexit2.interfaces[local].vrf | default('GRT') }}
-no switchport
-{{ macros.get_interface_ip_last(
-local_config.interfaces.fexit2.vrf | default(none),
-config.fexit.fexit2.interfaces[local].linknet4,
-config.fexit.fexit2.interfaces[local].linknet6 | default(none)
-)}}
+ description link; {{ config.fexit.fexit2.hostname }}; {{ config.fexit.fexit2.interfaces[local].port }}; {{ config.fexit.fexit2.interfaces[local].vrf | default('GRT') }}
+ no switchport
+ {{ macros.get_interface_ip_last(
+  local_config.interfaces.fexit2.vrf | default(none),
+  config.fexit.fexit2.interfaces[local].linknet4,
+  config.fexit.fexit2.interfaces[local].linknet6 | default(none)
+ )}}
 !
 {%- endif %}
 

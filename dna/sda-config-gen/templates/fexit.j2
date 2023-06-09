@@ -13,28 +13,26 @@ snmp-server location {{ local_config.snmp_location }}
 {%- if 'tcn1' in local_config.interfaces %}
 ! Linknet to TCN1
 interface {{ local_config.interfaces.tcn1.port }}
-description link; {{ config.tcn.tcn1.hostname }}; {{ config.tcn.tcn1.interfaces[local].port }}; {{
-config.tcn.tcn1.interfaces[local].vrf | default('GRT') }}
-no switchport
-{{ macros.get_interface_ip_first(
-local_config.interfaces.tcn1.vrf | default(none),
-local_config.interfaces.tcn1.linknet4,
-local_config.interfaces.tcn1.linknet6 | default(none)
-)}}
+ description link; {{ config.tcn.tcn1.hostname }}; {{ config.tcn.tcn1.interfaces[local].port }}; {{ config.tcn.tcn1.interfaces[local].vrf | default('GRT') }}
+ no switchport
+ {{ macros.get_interface_ip_first(
+  local_config.interfaces.tcn1.vrf | default(none),
+  local_config.interfaces.tcn1.linknet4,
+  local_config.interfaces.tcn1.linknet6 | default(none)
+ )}}
 !
 {%- endif %}
 
 {%- if 'tcn2' in local_config.interfaces %}
 ! Linknet to TCN2
 interface {{ local_config.interfaces.tcn2.port }}
-description link; {{ config.tcn.tcn2.hostname }}; {{ config.tcn.tcn2.interfaces[local].port }}; {{
-config.tcn.tcn2.interfaces[local].vrf | default('GRT') }}
-no switchport
-{{ macros.get_interface_ip_first(
-local_config.interfaces.tcn2.vrf | default(none),
-local_config.interfaces.tcn2.linknet4,
-local_config.interfaces.tcn2.linknet6 | default(none)
-)}}
+ description link; {{ config.tcn.tcn2.hostname }}; {{ config.tcn.tcn2.interfaces[local].port }}; {{ config.tcn.tcn2.interfaces[local].vrf | default('GRT') }}
+ no switchport
+ {{ macros.get_interface_ip_first(
+  local_config.interfaces.tcn2.vrf | default(none),
+  local_config.interfaces.tcn2.linknet4,
+  local_config.interfaces.tcn2.linknet6 | default(none)
+ )}}
 !
 {%- endif %}
 
