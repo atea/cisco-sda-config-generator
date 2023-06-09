@@ -3,6 +3,7 @@
 ! SDA {{ local }}
 ! {{ local_config.hostname }}
 
+{%- if 'tcn1' in local_config.interfaces %}
 ! Linknet to TCN1
 interface {{ local_config.interfaces.tcn1.port }}
  description link; {{ config.tcn.tcn1.hostname }}; {{ config.tcn.tcn1.interfaces[local].port }}; {{ config.tcn.tcn1.interfaces[local].vrf | default('GRT') }}
@@ -13,7 +14,9 @@ interface {{ local_config.interfaces.tcn1.port }}
   local_config.interfaces.tcn1.linknet6 | default(none)
  )}}
 !
+{%- endif %}
 
+{%- if 'tcn2' in local_config.interfaces %}
 ! Linknet to TCN2
 interface {{ local_config.interfaces.tcn2.port }}
  description link; {{ config.tcn.tcn2.hostname }}; {{ config.tcn.tcn2.interfaces[local].port }}; {{ config.tcn.tcn2.interfaces[local].vrf | default('GRT') }}
@@ -24,6 +27,7 @@ interface {{ local_config.interfaces.tcn2.port }}
   local_config.interfaces.tcn2.linknet6 | default(none)
  )}}
 !
+{%- endif %}
 
 ! Linknet to FEXIT1
 interface {{ local_config.interfaces.fexit1.port }}
@@ -67,6 +71,7 @@ router bgp {{ config.fusion.asn }}
  !
 {% include 'includes/bgp_template.j2' %}
  !
+{%- if 'tcn1' in local_config.interfaces %}
  ! TCN1
  {{ macros.bgp_neighbor_last_ip(
    local_config.interfaces.tcn1.linknet4,
@@ -78,7 +83,9 @@ router bgp {{ config.fusion.asn }}
    "eBGP to TCN1; " + config.tcn.tcn1.hostname + "; " + config.tcn.tcn1.interfaces[local].port + "; " + config.tcn.tcn1.interfaces[local].vrf | default('GRT'),
    config.global.bgp_paths
  )}}
+{%- endif %}
  !
+{%- if 'tcn2' in local_config.interfaces %}
  ! TCN2
  {{ macros.bgp_neighbor_last_ip(
    local_config.interfaces.tcn2.linknet4,
@@ -90,6 +97,7 @@ router bgp {{ config.fusion.asn }}
    "eBGP to TCN2; " + config.tcn.tcn2.hostname + "; " + config.tcn.tcn2.interfaces[local].port + "; " + config.tcn.tcn2.interfaces[local].vrf | default('GRT'),
    config.global.bgp_paths
  )}}
+{%- endif %}
  !
  ! FEXIT1
  {{ macros.bgp_neighbor_last_ip(
