@@ -1,0 +1,24 @@
+{%- import 'macros.j2' as macros %}
+{%- set local_config = config.fusion[local] %}
+! SDA {{ local }}
+! {{ local_config.hostname }}
+
+! Generate VRF contexts
+{%- for vrf in config.iptransit.fexit1.fusion1 %}
+{%- set vrf_name = macros.get_vrf(config.iptransit.fexit1.fusion1[vrf].vrf, vrf, border=false, grt_as_null=true) %}
+vrf definition {{ vrf_name }}
+rd {{ config.fusion.asn }}:{{ config.iptransit.fexit1.fusion1[vrf].tag }}
+!
+address-family ipv4
+exit-address-family
+!
+address-family ipv6
+exit-address-family
+!
+{%- endfor %}
+
+router bgp {{ config.fusion.asn }}
+{% include 'includes/bgp_common.j2' %}
+ !
+!
+

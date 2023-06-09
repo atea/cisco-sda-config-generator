@@ -93,3 +93,8 @@ generate_config(env, 'fexit_iptransit', 'fexit2')
 # generate fusion ip-transit
 generate_config(env, 'fusion_iptransit', 'fusion1')
 generate_config(env, 'fusion_iptransit', 'fusion2')
+
+# generate fusion base config + ibgp + fw-transit
+generate_config(env, 'fusion_fw', 'fusion1', 'fusion2')
+generate_config(env, 'fusion_fw', 'fusion2', 'fusion1')
+
