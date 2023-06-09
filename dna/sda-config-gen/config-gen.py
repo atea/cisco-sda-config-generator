@@ -14,7 +14,7 @@ project = 'projectx'
 config_file = work_dir + '/config_' + project + '.yml'
 generated_config_dir = work_dir + '/generated-configs/' + project
 if not os.path.exists(generated_config_dir):
-os.mkdir(generated_config_dir)
+  os.mkdir(generated_config_dir)
 config = yaml_from_file(config_file)
 
 def generate_config(env, template, local, peer=None):
@@ -79,8 +79,8 @@ generate_config(env, 'fexit', 'fexit1', 'fexit2')
 generate_config(env, 'fexit', 'fexit2', 'fexit1')
 
 # generate fs1a + fs1b
-generate_config(env, 'fs', 'fs1a', 'fs1b')
-generate_config(env, 'fs', 'fs1b', 'fs1a')
+generate_config(env, 'fs1', 'fs1a', 'fs1b')
+generate_config(env, 'fs1', 'fs1b', 'fs1a')
 
 # generate fexit bgp peer-session inherit
 generate_config(env, 'fexit_iptransit', 'fexit1')

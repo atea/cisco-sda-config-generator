@@ -1,5 +1,5 @@
 {%- import 'macros.j2' as macros %}
-{%- set local_config = config.fs[local] %}
+{%- set local_config = config.fs1[local] %}
 ! SDA {{ local }}
 ! {{ local_config.hostname }}
 
@@ -32,26 +32,29 @@ interface {{ local_config.interfaces.fexit2.port }}
  )}}
 !
 
-! Linknet between FS1a and FS1b
-interface {{ local_config.interfaces.fs.port }}
- description link; {{ config.fs[peer].hostname }}; {{ config.fs[peer].interfaces.fs.port }}; {{ config.fs[peer].interfaces.fs.vrf | default('GRT') }}
- no switchport
- {%- if local.endswith('1') or local.endswith('a') %}
- {{ macros.get_interface_ip_first(
-  local_config.interfaces.fs.port.vrf | default(none),
-  local_config.interfaces.fs.linknet4,
-  local_config.interfaces.fs.linknet6 | default(none)
- )}}
- {%- else %}
- {{ macros.get_interface_ip_last(
-  local_config.interfaces.fs.port.vrf | default(none),
-  local_config.interfaces.fs.linknet4,
-  local_config.interfaces.fs.linknet6 | default(none)
- )}}
- {%- endif %}
- ip router isis 
- isis network point-to-point 
+! Linknets between FS1a and FS1b
+{%- for link in local_config.interfaces.fs %}
+interface {{ local_config.interfaces.fs[link].port[local] }}
+description link; {{ config.fs1[peer].hostname }}; {{ config.fs1[peer].interfaces.fs[link].port[peer] }}; {{
+config.fs1[peer].interfaces.fs.vrf | default('GRT') }}
+no switchport
+{%- if local.endswith('1') or local.endswith('a') %}
+{{ macros.get_interface_ip_first(
+local_config.interfaces.fs.vrf | default(none),
+local_config.interfaces.fs[link].linknet4,
+local_config.interfaces.fs[link].linknet6 | default(none)
+)}}
+{%- else %}
+{{ macros.get_interface_ip_last(
+local_config.interfaces.fs.vrf | default(none),
+local_config.interfaces.fs[link].linknet4,
+local_config.interfaces.fs[link].linknet6 | default(none)
+)}}
+{%- endif %}
+ip router isis
+isis network point-to-point
 !
+{%- endfor %}
 
 ! Loopback
 interface Lo0
@@ -67,7 +70,7 @@ interface Lo0
 !
 {% include 'includes/common.j2' %}
 !
-router bgp {{ config.fs.asn }}
+router bgp {{ config.fs1.asn }}
 {% include 'includes/bgp_common.j2' %}
  !
 {% include 'includes/bgp_template.j2' %}
