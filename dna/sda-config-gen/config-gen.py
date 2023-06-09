@@ -17,9 +17,9 @@ if not os.path.exists(generated_config_dir):
   os.mkdir(generated_config_dir)
 config = yaml_from_file(config_file)
 
-def generate_config(env, template, local, peer=None):
+def generate_config(env, template, local, peer=None, fs=None):
   t = env.get_template(template + '.j2')
-  d = t.render(config=config, local=local, peer=peer)
+  d = t.render(config=config, local=local, peer=peer, fs=fs)
   save_config(work_dir, template + '_' + local, d)
 
 def save_config(work_dir, hostname, data):
@@ -79,8 +79,12 @@ generate_config(env, 'fexit', 'fexit1', 'fexit2')
 generate_config(env, 'fexit', 'fexit2', 'fexit1')
 
 # generate fs1a + fs1b
-generate_config(env, 'fs1', 'fs1a', 'fs1b')
-generate_config(env, 'fs1', 'fs1b', 'fs1a')
+generate_config(env, 'fs', 'fs1a', 'fs1b', 'fs1')
+generate_config(env, 'fs', 'fs1b', 'fs1a', 'fs1')
+
+# generate fs2a + fs2b
+generate_config(env, 'fs', 'fs2a', 'fs2b', 'fs2')
+generate_config(env, 'fs', 'fs2b', 'fs2a', 'fs2')
 
 # generate fexit bgp peer-session inherit
 generate_config(env, 'fexit_iptransit', 'fexit1')
