@@ -7,13 +7,13 @@
 {%- for vrf in config.iptransit.fexit1.fusion1 %}
 {%- set vrf_name = macros.get_vrf(config.iptransit.fexit1.fusion1[vrf].vrf, vrf, border=false, grt_as_null=true) %}
 vrf definition {{ vrf_name }}
-rd {{ config.fusion.asn }}:{{ config.iptransit.fexit1.fusion1[vrf].tag }}
-!
-address-family ipv4
-exit-address-family
-!
-address-family ipv6
-exit-address-family
+ rd {{ config.fusion.asn }}:{{ config.iptransit.fexit1.fusion1[vrf].tag }}
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
 !
 {%- endfor %}
 
@@ -21,4 +21,37 @@ router bgp {{ config.fusion.asn }}
 {% include 'includes/bgp_common.j2' %}
  !
 !
+
+! Linknets between FUSION1 and FUSION2
+{%- for link in local_config.interfaces.fusion %}
+interface {{ local_config.interfaces.fusion[link].port[local] }}
+ description link; {{ config.fusion[peer].hostname }}; {{ local_config.interfaces.fusion[link].port[peer] }}
+ no switchport
+!
+{%- for vrf in config.iptransit.fexit1.fusion1 %}
+{%- set local_vrf_name = macros.get_vrf(config.iptransit.fexit1[local][vrf].vrf, vrf, border=false, grt_as_null=true) %}
+{%- set peer_vrf_name = macros.get_vrf(config.iptransit.fexit1[local][vrf].vrf, vrf, border=true, grt_as_null=false) %}
+{%- if local_vrf_name == 'None' %}
+{%- set local_vrf_name = none -%}
+{%- endif %}
+interface {{ local_config.interfaces.fusion[link].port[local] }}.{{ config.iptransit.fexit1.fusion1[vrf].tag }}
+ description link; {{ config.fusion[peer].hostname }}; {{ local_config.interfaces.fusion[link].port[peer] }}.{{ config.iptransit.fexit1.fusion1[vrf].tag }}; {{ peer_vrf_name }}
+ encapsulation dot1q {{ config.iptransit.fexit1.fusion1[vrf].tag }}
+ no switchport
+ {%- if local.endswith('1') or local.endswith('a') %}
+ {{ macros.get_interface_ip_first(
+  local_vrf_name,
+  config.iptransit.fexit1.fusion1[vrf].linknet4,
+  config.iptransit.fexit1.fusion1[vrf].linknet6 | default(none)
+ )}}
+ {%- else %}
+ {{ macros.get_interface_ip_last(
+  local_vrf_name,
+  config.iptransit.fexit1.fusion1[vrf].linknet4,
+  config.iptransit.fexit1.fusion1[vrf].linknet6 | default(none)
+ )}}
+ {%- endif %}
+!
+{%- endfor %}
+{%- endfor %}
 
