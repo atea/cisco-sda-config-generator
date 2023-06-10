@@ -37,13 +37,15 @@ interface {{ local_config.interfaces.fusion[link].port[local] }}.{{ config.fusio
  {{ macros.get_interface_ip_first(
   vrf_name,
   config.fusiontransit[link][vrf].linknet4,
-  config.fusiontransit[link][vrf].linknet6 | default(none)
+  config.fusiontransit[link][vrf].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- else %}
  {{ macros.get_interface_ip_last(
   vrf_name,
   config.fusiontransit[link][vrf].linknet4,
-  config.fusiontransit[link][vrf].linknet6 | default(none)
+  config.fusiontransit[link][vrf].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- endif %}
 !
@@ -65,7 +67,8 @@ interface Vlan{{ config.fwtransit[local][vrf].tag }}
  {{ macros.get_interface_ip_first(
   vrf_name,
   config.fwtransit[local][vrf].linknet4,
-  config.fwtransit[local][vrf].linknet6 | default(none)
+  config.fwtransit[local][vrf].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endfor %}
@@ -131,7 +134,7 @@ router bgp {{ config.fusion.asn }}
  {%- else %}
  {%- set vrf_name = vrf -%}
  {%- endif %}
- {{ macros.bgp_neighbor_first_ip(
+ {{ macros.bgp_neighbor_last_ip(
    config.fwtransit[local][vrf].linknet4,
    config.fwtransit[local][vrf].linknet6 | default(none),
    vrf_name,

@@ -11,7 +11,8 @@ interface {{ local_config.interfaces.tcn1.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.tcn1.vrf | default(none),
   local_config.interfaces.tcn1.linknet4,
-  local_config.interfaces.tcn1.linknet6 | default(none)
+  local_config.interfaces.tcn1.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -24,7 +25,8 @@ interface {{ local_config.interfaces.tcn2.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.tcn2.vrf | default(none),
   local_config.interfaces.tcn2.linknet4,
-  local_config.interfaces.tcn2.linknet6 | default(none)
+  local_config.interfaces.tcn2.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -42,7 +44,8 @@ interface {{ local_config.interfaces.fexit1.port }}.{{ local_config.interfaces.f
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fexit1.vrf | default(none),
   local_config.interfaces.fexit1.linknet4,
-  local_config.interfaces.fexit1.linknet6 | default(none)
+  local_config.interfaces.fexit1.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -59,7 +62,8 @@ interface {{ local_config.interfaces.fexit2.port }}.{{ local_config.interfaces.f
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fexit2.vrf | default(none),
   local_config.interfaces.fexit2.linknet4,
-  local_config.interfaces.fexit2.linknet6 | default(none)
+  local_config.interfaces.fexit2.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 

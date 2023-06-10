@@ -20,7 +20,8 @@ interface {{ local_config.interfaces.fexit1.port }}.{{ config.iptransit.fexit1[l
  {{ macros.get_interface_ip_last(
   local_vrf_name,
   config.iptransit.fexit1[local][vrf].linknet4,
-  config.iptransit.fexit1[local][vrf].linknet6 | default(none)
+  config.iptransit.fexit1[local][vrf].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endfor %}
@@ -42,7 +43,8 @@ interface {{ local_config.interfaces.fexit2.port }}.{{ config.iptransit.fexit2[l
  {{ macros.get_interface_ip_last(
   local_vrf_name,
   config.iptransit.fexit2[local][vrf].linknet4,
-  config.iptransit.fexit2[local][vrf].linknet6 | default(none)
+  config.iptransit.fexit2[local][vrf].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endfor %}

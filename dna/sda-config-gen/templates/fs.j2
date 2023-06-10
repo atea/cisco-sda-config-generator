@@ -17,7 +17,8 @@ interface {{ local_config.interfaces.fexit1.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit1.vrf | default(none),
   config.fexit.fexit1.interfaces[local].linknet4,
-  config.fexit.fexit1.interfaces[local].linknet6 | default(none)
+  config.fexit.fexit1.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -28,7 +29,8 @@ interface {{ local_config.interfaces.fexit2.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit2.vrf | default(none),
   config.fexit.fexit2.interfaces[local].linknet4,
-  config.fexit.fexit2.interfaces[local].linknet6 | default(none)
+  config.fexit.fexit2.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -41,13 +43,15 @@ interface {{ local_config.interfaces.fs[link].port[local] }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fs.vrf | default(none),
   local_config.interfaces.fs[link].linknet4,
-  local_config.interfaces.fs[link].linknet6 | default(none)
+  local_config.interfaces.fs[link].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- else %}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fs.vrf | default(none),
   local_config.interfaces.fs[link].linknet4,
-  local_config.interfaces.fs[link].linknet6 | default(none)
+  local_config.interfaces.fs[link].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- endif %}
  ip router isis

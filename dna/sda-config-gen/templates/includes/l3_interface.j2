@@ -1,6 +1,6 @@
  no shutdown
  no ip redirects
- bfd interval 500 min_rx 500 multiplier 3
+ bfd interval {{ bfd.tx_interval }} min_rx {{ bfd.rx_interval }} multiplier {{ bfd.multiplier }}
  ip pim sparse-mode
  ip pim bfd
  load-interval 30

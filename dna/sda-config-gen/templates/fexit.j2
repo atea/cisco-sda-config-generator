@@ -18,7 +18,8 @@ interface {{ local_config.interfaces.tcn1.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.tcn1.vrf | default(none),
   local_config.interfaces.tcn1.linknet4,
-  local_config.interfaces.tcn1.linknet6 | default(none)
+  local_config.interfaces.tcn1.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -31,7 +32,8 @@ interface {{ local_config.interfaces.tcn2.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.tcn2.vrf | default(none),
   local_config.interfaces.tcn2.linknet4,
-  local_config.interfaces.tcn2.linknet6 | default(none)
+  local_config.interfaces.tcn2.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -50,7 +52,8 @@ interface Vlan{{ config.fusion.fusion1.interfaces[local].tag }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fusion1.vrf | default(none),
   config.fusion.fusion1.interfaces[local].linknet4,
-  config.fusion.fusion1.interfaces[local].linknet6 | default(none)
+  config.fusion.fusion1.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -68,7 +71,8 @@ interface Vlan{{ config.fusion.fusion2.interfaces[local].tag }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fusion2.vrf | default(none),
   config.fusion.fusion2.interfaces[local].linknet4,
-  config.fusion.fusion2.interfaces[local].linknet6 | default(none)
+  config.fusion.fusion2.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -81,13 +85,15 @@ interface {{ local_config.interfaces.fexit[link].port[local] }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fexit.vrf | default(none),
   local_config.interfaces.fexit[link].linknet4,
-  local_config.interfaces.fexit[link].linknet6 | default(none)
+  local_config.interfaces.fexit[link].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- else %}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit.vrf | default(none),
   local_config.interfaces.fexit[link].linknet4,
-  local_config.interfaces.fexit[link].linknet6 | default(none)
+  local_config.interfaces.fexit[link].linknet6 | default(none),
+  config.global.bfd
  )}}
  {%- endif %}
  ip router isis 
@@ -102,7 +108,8 @@ interface {{ local_config.interfaces.fs1a.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fs1a.vrf | default(none),
   local_config.interfaces.fs1a.linknet4,
-  local_config.interfaces.fs1a.linknet6 | default(none)
+  local_config.interfaces.fs1a.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 
@@ -113,7 +120,8 @@ interface {{ local_config.interfaces.fs1b.port }}
  {{ macros.get_interface_ip_first(
   local_config.interfaces.fs1b.vrf | default(none),
   local_config.interfaces.fs1b.linknet4,
-  local_config.interfaces.fs1b.linknet6 | default(none)
+  local_config.interfaces.fs1b.linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 

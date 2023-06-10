@@ -18,7 +18,8 @@ interface {{ local_config.interfaces.fusion1.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fusion1.vrf | default(none),
   config.fusion.fusion1.interfaces[local].linknet4,
-  config.fusion.fusion1.interfaces[local].linknet6 | default(none)
+  config.fusion.fusion1.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -31,7 +32,8 @@ interface {{ local_config.interfaces.fexit1.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit1.vrf | default(none),
   config.fexit.fexit1.interfaces[local].linknet4,
-  config.fexit.fexit1.interfaces[local].linknet6 | default(none)
+  config.fexit.fexit1.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -44,7 +46,8 @@ interface {{ local_config.interfaces.fusion2.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fusion2.vrf | default(none),
   config.fusion.fusion2.interfaces[local].linknet4,
-  config.fusion.fusion2.interfaces[local].linknet6 | default(none)
+  config.fusion.fusion2.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}
@@ -57,7 +60,8 @@ interface {{ local_config.interfaces.fexit2.port }}
  {{ macros.get_interface_ip_last(
   local_config.interfaces.fexit2.vrf | default(none),
   config.fexit.fexit2.interfaces[local].linknet4,
-  config.fexit.fexit2.interfaces[local].linknet6 | default(none)
+  config.fexit.fexit2.interfaces[local].linknet6 | default(none),
+  config.global.bfd
  )}}
 !
 {%- endif %}

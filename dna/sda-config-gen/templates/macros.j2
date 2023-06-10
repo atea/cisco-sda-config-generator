@@ -1,4 +1,4 @@
-{%- macro get_interface_ip_first(vrf, ip_net4, ip_net6) -%}
+{%- macro get_interface_ip_first(vrf, ip_net4, ip_net6, bfd) -%}
  {%- if vrf is not none -%}
  vrf forwarding {{ vrf }}
  {%- endif -%}
@@ -10,7 +10,7 @@
  {% include 'includes/l3_interface.j2' %}
 {%- endmacro -%}
 
-{%- macro get_interface_ip_last(vrf, ip_net4, ip_net6) -%}
+{%- macro get_interface_ip_last(vrf, ip_net4, ip_net6, bfd) -%}
  {%- if vrf is not none -%}
  vrf forwarding {{ vrf }}
  {%- endif -%}
