@@ -79,14 +79,14 @@ router bgp {{ config[fs].asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   redistribute connected
   redistribute isis level-1-2
   network {{ local_config.ipv4 }} mask 255.255.255.255
  exit-address-family
  {%- if local_config.ipv6 is defined %}
  address-family ipv6
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   redistribute connected
   network {{ local_config.ipv6 }}/128
  exit-address-family
@@ -101,7 +101,7 @@ router bgp {{ config[fs].asn }}
    local_config.interfaces.fexit1.port,
    deny_default | default(false),
    "eBGP to FEXIT1; " + config.fexit.fexit1.hostname + "; " + config.fexit.fexit1.interfaces[local].port + "; " + config.fexit.fexit1.interfaces[local].vrf | default('GRT'),
-  config.global.bgp_paths
+  config.global.bgp.paths
  )}}
  !
  ! FEXIT2
@@ -113,7 +113,7 @@ router bgp {{ config[fs].asn }}
    local_config.interfaces.fexit2.port,
    deny_default | default(false),
    "eBGP to FEXIT2; " + config.fexit.fexit2.hostname + "; " + config.fexit.fexit2.interfaces[local].port + "; " + config.fexit.fexit2.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
 !

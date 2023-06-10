@@ -110,7 +110,7 @@ router bgp {{ config.fusion.asn }}
    local_config.interfaces.fusion[link].port[local] + "." + config.fusiontransit[link][vrf].tag,
    deny_default | default(false),
    "iBGP to " + config.fusion[peer].hostname + "; " + local_config.interfaces.fusion[link].port[peer] + "." + config.fusiontransit[link][vrf].tag + "; " + vrf_name,
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  {%- else %}
  {{ macros.bgp_neighbor_first_ip(
@@ -121,7 +121,7 @@ router bgp {{ config.fusion.asn }}
    local_config.interfaces.fusion[link].port[local] + "." + config.fusiontransit[link][vrf].tag,
    deny_default | default(false),
    "iBGP to " + config.fusion[peer].hostname + "; " + local_config.interfaces.fusion[link].port[peer] + "." + config.fusiontransit[link][vrf].tag + "; " + vrf_name,
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  {%- endif %}
  {%- endfor %}
@@ -142,7 +142,7 @@ router bgp {{ config.fusion.asn }}
    "Vlan" + config.fwtransit[local][vrf].tag,
    deny_default | default(false),
    "eBGP to firewall; " + config.fw.fw1.interfaces[local].port + "." + config.fwtransit[local][vrf].tag + "; " + vrf_name,
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  {%- endfor %}
 !

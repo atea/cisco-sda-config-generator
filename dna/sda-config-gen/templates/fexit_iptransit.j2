@@ -35,7 +35,7 @@ router bgp {{ config.fexit.asn }}
     config.iptransit[local].fusion1[vrf].linknet6 | default(none),
     local_vrf_name,
     "eBGP to FUSION1;  " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.iptransit[local].fusion1[vrf].tag + "; " + peer_vrf_name,
-    config.global.bgp_paths
+    config.global.bgp.paths
   )}}
 {%- endfor %}
  !
@@ -51,6 +51,6 @@ router bgp {{ config.fexit.asn }}
     config.iptransit[local].fusion2[vrf].linknet6 | default(none),
     local_vrf_name,
     "eBGP to FUSION2;  " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.iptransit[local].fusion2[vrf].tag + "; " + peer_vrf_name,
-    config.global.bgp_paths
+    config.global.bgp.paths
   )}}
 {%- endfor %}

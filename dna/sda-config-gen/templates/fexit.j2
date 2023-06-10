@@ -147,7 +147,7 @@ router bgp {{ config.fexit.asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   network {{ local_config.ipv4 }} mask 255.255.255.255
   {%- for link in local_config.interfaces.fexit %}
   network {{ local_config.interfaces.fexit[link].linknet4 | network }} mask {{ local_config.interfaces.fexit[link].linknet4 | netmask }}
@@ -155,7 +155,7 @@ router bgp {{ config.fexit.asn }}
  exit-address-family
  {%- if local_config.ipv6 is defined %}
  address-family ipv6
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   network {{ local_config.ipv6 }}/128
   {%- for link in local_config.interfaces.fexit %}
   {%- if local_config.interfaces.fexit[link].linknet6 is defined %}
@@ -175,7 +175,7 @@ router bgp {{ config.fexit.asn }}
    local_config.interfaces.tcn1.port,
    deny_default | default(true),
    "eBGP to TCN1; " + config.tcn.tcn1.hostname + "; " + config.tcn.tcn1.interfaces[local].port + "; " + config.tcn.tcn1.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !
@@ -189,7 +189,7 @@ router bgp {{ config.fexit.asn }}
    local_config.interfaces.tcn2.port,
    deny_default | default(true),
    "eBGP to TCN2; " + config.tcn.tcn2.hostname + "; " + config.tcn.tcn2.interfaces[local].port + "; " + config.tcn.tcn2.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !
@@ -202,7 +202,7 @@ router bgp {{ config.fexit.asn }}
    "Vlan" + config.fusion.fusion1.interfaces[local].tag,
    deny_default | default(false),
    "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "." + config.fusion.fusion1.interfaces[local].tag + "; " + config.fusion.fusion1.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
  ! FUSION2
@@ -214,7 +214,7 @@ router bgp {{ config.fexit.asn }}
    "Vlan" + config.fusion.fusion2.interfaces[local].tag,
    deny_default | default(false),
    "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "." + config.fusion.fusion2.interfaces[local].tag + "; " + config.fusion.fusion2.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
  ! FS1a
@@ -226,7 +226,7 @@ router bgp {{ config.fexit.asn }}
    local_config.interfaces.fs1a.port,
    deny_default | default(false),
    "eBGP to FS1a; " + config.fs1.fs1a.hostname + "; " + config.fs1.fs1a.interfaces[local].port + "; " + config.fs1.fs1a.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
  ! FS1b
@@ -238,7 +238,7 @@ router bgp {{ config.fexit.asn }}
    local_config.interfaces.fs1b.port,
    deny_default | default(false),
    "eBGP to FS1b; " + config.fs1.fs1b.hostname + "; " + config.fs1.fs1b.interfaces[local].port + "; " + config.fs1.fs1b.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
 !

@@ -83,12 +83,12 @@ router bgp {{ local_config.asn }}
 {% include 'includes/bgp_template.j2' %}
  !
  address-family ipv4
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   network {{ local_config.ipv4 }} mask 255.255.255.255
  exit-address-family
  {%- if local_config.ipv6 is defined %}
  address-family ipv6
-  maximum-paths {{ config.global.bgp_paths }}
+  maximum-paths {{ config.global.bgp.paths }}
   network {{ local_config.ipv6 }}/128
  exit-address-family
  {%- endif %}
@@ -103,7 +103,7 @@ router bgp {{ local_config.asn }}
    local_config.interfaces.fusion1.port,
    deny_default | default(false),
    "eBGP to FUSION1; " + config.fusion.fusion1.hostname + "; " + config.fusion.fusion1.interfaces[local].port + "; " + config.fusion.fusion1.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !
@@ -117,7 +117,7 @@ router bgp {{ local_config.asn }}
    local_config.interfaces.fexit1.port,
    deny_default | default(false),
    "eBGP to FEXIT1; " + config.fexit.fexit1.hostname + "; " + config.fexit.fexit1.interfaces[local].port + "; " + config.fexit.fexit1.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !
@@ -131,7 +131,7 @@ router bgp {{ local_config.asn }}
    local_config.interfaces.fusion2.port,
    deny_default | default(false),
    "eBGP to FUSION2; " + config.fusion.fusion2.hostname + "; " + config.fusion.fusion2.interfaces[local].port + "; " + config.fusion.fusion2.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !
@@ -145,7 +145,7 @@ router bgp {{ local_config.asn }}
    local_config.interfaces.fexit2.port,
    deny_default | default(false),
    "eBGP to FEXIT2; " + config.fexit.fexit2.hostname + "; " + config.fexit.fexit2.interfaces[local].port + "; " + config.fexit.fexit2.interfaces[local].vrf | default('GRT'),
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
 {%- endif %}
  !

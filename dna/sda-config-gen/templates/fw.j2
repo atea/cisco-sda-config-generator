@@ -46,7 +46,7 @@ set network virtual-router {{ config.fw.vr }} protocol bgp install-route no
 set network virtual-router {{ config.fw.vr }} protocol bgp reject-default-route no
 
 # BGP Auth profile
-set network virtual-router {{ config.fw.vr }} protocol bgp auth-profile {{ config.fw.bgp_auth_profile }} secret {{ config.global.bgp_password }}
+set network virtual-router {{ config.fw.vr }} protocol bgp auth-profile {{ config.fw.bgp_auth_profile }} secret {{ config.global.bgp.password }}
 
 # Export default routes (so that FW gets all traffic even if FW don't get default route from upstream)
 set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules 0.0.0.0/0 address-family-identifier ipv4

@@ -66,7 +66,7 @@ router bgp {{ config.fusion.asn }}
    local_config.interfaces.fexit1.port + "." + config.iptransit.fexit1[local][vrf].tag,
    deny_default | default(true),
    "eBGP to FEXIT1; " + config.fexit.fexit1.hostname + "; Vlan" + config.iptransit.fexit1[local][vrf].tag + "; " + peer_vrf_name,
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
 {%- endfor %}
@@ -86,7 +86,7 @@ router bgp {{ config.fusion.asn }}
    local_config.interfaces.fexit2.port + "." + config.iptransit.fexit2[local][vrf].tag,
    deny_default | default(true),
    "eBGP to FEXIT1; " + config.fexit.fexit2.hostname + "; Vlan" + config.iptransit.fexit2[local][vrf].tag + "; " + peer_vrf_name,
-   config.global.bgp_paths
+   config.global.bgp.paths
  )}}
  !
 {%- endfor %}
