@@ -50,19 +50,7 @@ interface {{ local_config.interfaces.fusion[link].port[local] }}.{{ config.fusio
 {%- endfor %}
 {%- endfor %}
 
-{%- for fw in ['fw1', 'fw2'] %}
-! Link to FW {{ fw }}
-interface {{ local_config.interfaces[fw].port }}
- description link; {{ config.fw[fw].hostname }}; {{ config.fw[fw].interfaces[local].port }}
-{% include 'includes/l2_interface.j2' %}
- switchport trunk native vlan {{ local_config.interfaces[fw].native }}
-{%- set allowed_vlans = [] -%}
-{%- for vrf in config.fwtransit[local] %}
-{%- set dummy = allowed_vlans.append(config.fwtransit[local][vrf].tag) %}
-{%- endfor %}
- switchport trunk allowed vlan add {{ allowed_vlans|join(',') }}
-!
-{%- endfor %}
+! Firewall VLANs
 {%- for vrf in config.fwtransit[local] %}
 {%- if vrf == 'GRT' %}
 {%- set vrf_name = none -%}
@@ -79,6 +67,20 @@ interface Vlan{{ config.fwtransit[local][vrf].tag }}
   config.fwtransit[local][vrf].linknet4,
   config.fwtransit[local][vrf].linknet6 | default(none)
  )}}
+!
+{%- endfor %}
+
+{%- for fw in ['fw1', 'fw2'] %}
+! Link to FW {{ fw }}
+interface {{ local_config.interfaces[fw].port }}
+ description link; {{ config.fw[fw].hostname }}; {{ config.fw[fw].interfaces[local].port }}
+{% include 'includes/l2_interface.j2' %}
+ switchport trunk native vlan {{ local_config.interfaces[fw].native }}
+{%- set allowed_vlans = [] -%}
+{%- for vrf in config.fwtransit[local] %}
+{%- set dummy = allowed_vlans.append(config.fwtransit[local][vrf].tag) %}
+{%- endfor %}
+ switchport trunk allowed vlan add {{ allowed_vlans|join(',') }}
 !
 {%- endfor %}
 
