@@ -86,7 +86,7 @@ set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules a
 
 # Zones
 {%- for vrf in config.fwtransit.fusion1 %}
-set zone {{ vrf }} network layer3
+set zone {{ vrf }} network layer3 [ ]
 set zone {{ vrf }} network zone-protection-profile {{ config.fw.zone_profile }}
 {%- endfor %}
 
