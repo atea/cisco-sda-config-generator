@@ -38,14 +38,6 @@
  {%- endif %}
 {%- endmacro -%}
 
-{%- macro bgp_neighbor_first_ip(linknet, asn, description, update_source, prefix_list) -%}
- {{ bgp_neighbor(linknet, asn, description, update_source, prefix_list, linknet | first_ip ) }}
-{%- endmacro -%}
-
-{%- macro bgp_neighbor_last_ip(linknet, asn, description, update_source, prefix_list) -%}
- {{ bgp_neighbor(linknet, asn, description, update_source, prefix_list, linknet | last_ip ) }}
-{%- endmacro -%}
-
 {%- macro bgp_neighbor_first_ip(linknet4, linknet6, vrf, asn, update_source, deny_default, description, bgp_paths, desc_and_inherit_only=false) -%}
  {{ bgp_neighbor(linknet4, linknet6, vrf, asn, update_source, deny_default, description, bgp_paths, desc_and_inherit_only, first_ip=true) }}
 {%- endmacro -%}
