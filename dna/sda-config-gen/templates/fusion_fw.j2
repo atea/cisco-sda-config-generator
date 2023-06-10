@@ -17,41 +17,127 @@ vrf definition {{ vrf_name }}
 !
 {%- endfor %}
 
-router bgp {{ config.fusion.asn }}
-{% include 'includes/bgp_common.j2' %}
- !
-!
-
 ! Linknets between FUSION1 and FUSION2
 {%- for link in local_config.interfaces.fusion %}
 interface {{ local_config.interfaces.fusion[link].port[local] }}
  description link; {{ config.fusion[peer].hostname }}; {{ local_config.interfaces.fusion[link].port[peer] }}
  no switchport
 !
-{%- for vrf in config.iptransit.fexit1.fusion1 %}
-{%- set local_vrf_name = macros.get_vrf(config.iptransit.fexit1[local][vrf].vrf, vrf, border=false, grt_as_null=true) %}
-{%- set peer_vrf_name = macros.get_vrf(config.iptransit.fexit1[local][vrf].vrf, vrf, border=true, grt_as_null=false) %}
-{%- if local_vrf_name == 'None' %}
-{%- set local_vrf_name = none -%}
+{%- for vrf in config.fusiontransit[link] %}
+{%- if vrf == 'GRT' %}
+{%- set vrf_name = none -%}
+{%- else %}
+{%- set vrf_name = vrf -%}
 {%- endif %}
-interface {{ local_config.interfaces.fusion[link].port[local] }}.{{ config.iptransit.fexit1.fusion1[vrf].tag }}
- description link; {{ config.fusion[peer].hostname }}; {{ local_config.interfaces.fusion[link].port[peer] }}.{{ config.iptransit.fexit1.fusion1[vrf].tag }}; {{ peer_vrf_name }}
- encapsulation dot1q {{ config.iptransit.fexit1.fusion1[vrf].tag }}
+interface {{ local_config.interfaces.fusion[link].port[local] }}.{{ config.fusiontransit[link][vrf].tag }}
+ description link; {{ config.fusion[peer].hostname }}; {{ local_config.interfaces.fusion[link].port[peer] }}.{{ config.fusiontransit[link][vrf].tag }}; {{ vrf_name }}
+ encapsulation dot1q {{ config.fusiontransit[link][vrf].tag }}
  no switchport
  {%- if local.endswith('1') or local.endswith('a') %}
  {{ macros.get_interface_ip_first(
-  local_vrf_name,
-  config.iptransit.fexit1.fusion1[vrf].linknet4,
-  config.iptransit.fexit1.fusion1[vrf].linknet6 | default(none)
+  vrf_name,
+  config.fusiontransit[link][vrf].linknet4,
+  config.fusiontransit[link][vrf].linknet6 | default(none)
  )}}
  {%- else %}
  {{ macros.get_interface_ip_last(
-  local_vrf_name,
-  config.iptransit.fexit1.fusion1[vrf].linknet4,
-  config.iptransit.fexit1.fusion1[vrf].linknet6 | default(none)
+  vrf_name,
+  config.fusiontransit[link][vrf].linknet4,
+  config.fusiontransit[link][vrf].linknet6 | default(none)
  )}}
  {%- endif %}
 !
 {%- endfor %}
 {%- endfor %}
 
+{%- for fw in ['fw1', 'fw2'] %}
+! Link to FW {{ fw }}
+interface {{ local_config.interfaces[fw].port }}
+ description link; {{ config.fw[fw].hostname }}; {{ config.fw[fw].interfaces[local].port }}
+{% include 'includes/l2_interface.j2' %}
+ switchport trunk native vlan {{ local_config.interfaces[fw].native }}
+{%- set allowed_vlans = [] -%}
+{%- for vrf in config.fwtransit[local] %}
+{%- set dummy = allowed_vlans.append(config.fwtransit[local][vrf].tag) %}
+{%- endfor %}
+ switchport trunk allowed vlan add {{ allowed_vlans|join(',') }}
+!
+{%- endfor %}
+{%- for vrf in config.fwtransit[local] %}
+{%- if vrf == 'GRT' %}
+{%- set vrf_name = none -%}
+{%- else %}
+{%- set vrf_name = vrf -%}
+{%- endif %}
+vlan {{ config.fwtransit[local][vrf].tag }}
+ name link_fw_{{ vrf }}
+!
+interface Vlan{{ config.fwtransit[local][vrf].tag }}
+ description link; firewall; {{ config.fw.fw1.interfaces[local].port }}.{{ config.fwtransit[local][vrf].tag }}; {{ vrf }}
+ {{ macros.get_interface_ip_first(
+  vrf_name,
+  config.fwtransit[local][vrf].linknet4,
+  config.fwtransit[local][vrf].linknet6 | default(none)
+ )}}
+!
+{%- endfor %}
+
+! BGP config
+router bgp {{ config.fusion.asn }}
+{% include 'includes/bgp_common.j2' %}
+ !
+{% include 'includes/bgp_template.j2' %}
+ !
+ {%- for link in local_config.interfaces.fusion %}
+ ! BGP to other FUSION {{ link }}
+ {%- for vrf in config.fusiontransit[link] %}
+ {%- if vrf == 'GRT' %}
+ {%- set vrf_name = none -%}
+ {%- else %}
+ {%- set vrf_name = vrf -%}
+ {%- endif %}
+ {%- if local.endswith('1') or local.endswith('a') %}
+ {{ macros.bgp_neighbor_last_ip(
+   config.fusiontransit[link][vrf].linknet4,
+   config.fusiontransit[link][vrf].linknet6 | default(none),
+   vrf_name,
+   config.fusion.asn,
+   local_config.interfaces.fusion[link].port[local] + "." + config.fusiontransit[link][vrf].tag,
+   deny_default | default(false),
+   "iBGP to " + config.fusion[peer].hostname + "; " + local_config.interfaces.fusion[link].port[peer] + "." + config.fusiontransit[link][vrf].tag + "; " + vrf_name,
+   config.global.bgp_paths
+ )}}
+ {%- else %}
+ {{ macros.bgp_neighbor_first_ip(
+   config.fusiontransit[link][vrf].linknet4,
+   config.fusiontransit[link][vrf].linknet6 | default(none),
+   vrf_name,
+   config.fusion.asn,
+   local_config.interfaces.fusion[link].port[local] + "." + config.fusiontransit[link][vrf].tag,
+   deny_default | default(false),
+   "iBGP to " + config.fusion[peer].hostname + "; " + local_config.interfaces.fusion[link].port[peer] + "." + config.fusiontransit[link][vrf].tag + "; " + vrf_name,
+   config.global.bgp_paths
+ )}}
+ {%- endif %}
+ {%- endfor %}
+ {%- endfor %}
+ !
+ ! BGP to firewall
+ {%- for vrf in config.fwtransit[local] %}
+ {%- if vrf == 'GRT' %}
+ {%- set vrf_name = none -%}
+ {%- else %}
+ {%- set vrf_name = vrf -%}
+ {%- endif %}
+ {{ macros.bgp_neighbor_first_ip(
+   config.fwtransit[local][vrf].linknet4,
+   config.fwtransit[local][vrf].linknet6 | default(none),
+   vrf_name,
+   config.fw.asn,
+   "Vlan" + config.fwtransit[local][vrf].tag,
+   deny_default | default(false),
+   "eBGP to firewall; " + config.fw.fw1.interfaces[local].port + "." + config.fwtransit[local][vrf].tag + "; " + vrf_name,
+   config.global.bgp_paths
+ )}}
+ {%- endfor %}
+!
