@@ -38,6 +38,14 @@
  {%- endif %}
 {%- endmacro -%}
 
+{%- macro get_fw_local_ip(ip_net) -%}
+{{ ip_net | last_ip_prefix }}
+{%- endmacro -%}
+
+{%- macro get_fw_peer_ip(ip_net) -%}
+{{ ip_net | first_ip }}
+{%- endmacro -%}
+
 {%- macro bgp_neighbor_first_ip(linknet4, linknet6, vrf, asn, update_source, deny_default, description, bgp_paths, desc_and_inherit_only=false) -%}
  {{ bgp_neighbor(linknet4, linknet6, vrf, asn, update_source, deny_default, description, bgp_paths, desc_and_inherit_only, first_ip=true) }}
 {%- endmacro -%}

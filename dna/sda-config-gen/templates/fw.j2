@@ -1,0 +1,152 @@
+{%- import 'macros.j2' as macros %}
+{%- set local_config = config.fw[local] %}
+# SDA Firewall {{ local }}
+# {{ local_config.hostname }}
+
+# Lo0
+set address loopback_mgmt_palo_lo0_ipv4 ip-netmask {{ config.fw.ipv4 }}/32
+set address loopback_mgmt_palo_lo0_ipv6 ip-netmask {{ config.fw.ipv6 }}/128
+
+set network interface loopback interface-management-profile loopback_mgmt
+set network interface loopback ipv6 address loopback_mgmt_palo_lo0_ipv6 enable-on-interface yes
+set network interface loopback ipv6 enabled yes
+set network interface loopback ip loopback_mgmt_palo_lo0_ipv4
+
+set import network interface loopback
+set network virtual-router {{ config.fw.vr }} interface loopback
+set zone mgmt network layer3 loopback
+
+# BFD profile
+set network profiles bfd-profile {{ config.global.bfd.profile }} min-tx-interval {{ config.global.bfd.tx_interval }}
+set network profiles bfd-profile {{ config.global.bfd.profile }} min-rx-interval {{ config.global.bfd.rx_interval }}
+set network profiles bfd-profile {{ config.global.bfd.profile }} detection-multiplier {{ config.global.bfd.multiplier }}
+set network virtual-router {{ config.fw.vr }} protocol bgp global-bfd profile {{ config.global.bfd.profile }}
+
+# BGP redistribution of static & connected
+set network virtual-router {{ config.fw.vr }} protocol redist-profile {{ config.fw.vr }}-bgp-ipv4 filter type [ connect static ]
+set network virtual-router {{ config.fw.vr }} protocol redist-profile {{ config.fw.vr }}-bgp-ipv4 priority 100
+set network virtual-router {{ config.fw.vr }} protocol redist-profile {{ config.fw.vr }}-bgp-ipv4 action redist
+set network virtual-router {{ config.fw.vr }} protocol redist-profile-ipv6 {{ config.fw.vr }}-bgp-ipv6 filter type [ connect static ]
+set network virtual-router {{ config.fw.vr }} protocol redist-profile-ipv6 {{ config.fw.vr }}-bgp-ipv6 priority 100
+set network virtual-router {{ config.fw.vr }} protocol redist-profile-ipv6 {{ config.fw.vr }}-bgp-ipv6 action redist
+
+# Assign BGP redistribution profiles
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv4 address-family-identifier ipv4
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv4 route-table both
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv4 enable yes
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv4 set-origin incomplete
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv6 address-family-identifier ipv6
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv6 route-table unicast
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv6 enable yes
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules {{ config.fw.vr }}-bgp-ipv6 set-origin incomplete
+
+# Enable BGP, accept default routes, but don't install routes (do this manually after verifying everything)
+set network virtual-router {{ config.fw.vr }} protocol bgp enable yes
+set network virtual-router {{ config.fw.vr }} protocol bgp install-route no
+set network virtual-router {{ config.fw.vr }} protocol bgp reject-default-route no
+
+# BGP Auth profile
+set network virtual-router {{ config.fw.vr }} protocol bgp auth-profile {{ config.fw.bgp_auth_profile }} secret {{ config.global.bgp_password }}
+
+# Export default routes (so that FW gets all traffic even if FW don't get default route from upstream)
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules 0.0.0.0/0 address-family-identifier ipv4
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules 0.0.0.0/0 route-table both
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules 0.0.0.0/0 enable yes
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules 0.0.0.0/0 set-origin incomplete
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules ::/0 address-family-identifier ipv6
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules ::/0 route-table unicast
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules ::/0 enable yes
+set network virtual-router {{ config.fw.vr }} protocol bgp redist-rules ::/0 set-origin incomplete
+
+# BGP import rules
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv4 action deny
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv4 match address-prefix 0.0.0.0/0 exact yes
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv4 match route-table both
+
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv6 action deny
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv6 match address-prefix ::/0 exact yes
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules deny-default-ipv6 match route-table unicast
+
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv4 action allow
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv4 match address-prefix 0.0.0.0/0 exact no
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv4 match route-table both
+
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv6 action allow
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv6 match address-prefix ::/0 exact no
+set network virtual-router {{ config.fw.vr }} protocol bgp policy import rules allow-all-ipv6 match route-table unicast
+
+# BGP export rules
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv4 action allow
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv4 match address-prefix 0.0.0.0/0 exact no
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv4 match route-table both
+
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv6 action allow
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv6 match address-prefix ::/0 exact no
+set network virtual-router {{ config.fw.vr }} protocol bgp policy export rules allow-all-ipv6 match route-table unicast
+
+# Zones
+{%- for vrf in config.fwtransit.fusion1 %}
+set zone {{ vrf }} network layer3
+set zone {{ vrf }} network zone-protection-profile {{ config.fw.zone_profile }}
+{%- endfor %}
+
+{%- for peer in config.fwtransit %}
+
+# Linknet- and BGP-config towards {{ peer }}
+{%- for vrf in config.fwtransit[peer] %}
+{%- set object_name = vrf + "_" + config.fusion[peer].hostname %}
+{%- set subinterface_name = config.fw.fw1.interfaces[peer].port + "." + config.fwtransit[peer][vrf].tag %}
+
+# Objects for VRF {{ vrf }} for {{ peer }}
+set address linknet_{{ object_name }}_local_ipv4 ip-netmask {{ macros.get_fw_local_ip(config.fwtransit[peer][vrf].linknet4) }}
+set address linknet_{{ object_name }}_local_ipv6 ip-netmask {{ macros.get_fw_local_ip(config.fwtransit[peer][vrf].linknet6) }}
+set address linknet_{{ object_name }}_peer_ipv4 ip-netmask {{ macros.get_fw_peer_ip(config.fwtransit[peer][vrf].linknet4) }}
+set address linknet_{{ object_name }}_peer_ipv6 ip-netmask {{ macros.get_fw_peer_ip(config.fwtransit[peer][vrf].linknet6) }}
+
+# Interface for VRF {{ vrf }} towards {{ peer }}
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 neighbor-discovery enable-dad yes
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 neighbor-discovery enable-ndp-monitor yes
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 address linknet_{{ object_name }}_local_ipv6 enable-on-interface yes
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 enabled yes
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ip linknet_{{ object_name }}_local_ipv4
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} interface-management-profile {{ config.fw.mgmt_profile }}
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} tag {{ config.fwtransit[peer][vrf].tag }}
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} comment "{{ vrf }}; {{ config.fusion[peer].hostname }}"
+set import network interface {{ subinterface_name }}
+set network virtual-router {{ config.fw.vr }} interface {{ subinterface_name }}
+set zone mgmt network layer3 {{ subinterface_name }}
+
+# BGP for VRF {{ vrf }} towards {{ peer }}
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} type ebgp remove-private-as no
+
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 peer-as 65000
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 enable-mp-bgp yes
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 address-family-identifier ipv4
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 subsequent-address-family-identifier unicast yes
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 subsequent-address-family-identifier multicast yes
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 local-address interface {{ subinterface_name }}
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 local-address ip linknet_{{ object_name }}_local_ipv4
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 peer-address ip linknet_{{ object_name }}_peer_ipv4
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv4 connection-options authentication {{ config.fw.bgp_auth_profile }}
+
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 peer-as 65000
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 enable-mp-bgp yes
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 address-family-identifier ipv6
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 subsequent-address-family-identifier unicast yes
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 subsequent-address-family-identifier multicast no
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 local-address interface {{ subinterface_name }}
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 local-address ip linknet_{{ object_name }}_local_ipv6
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 peer-address ip linknet_{{ object_name }}_peer_ipv6
+set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} peer {{ object_name }}_ipv6 connection-options authentication {{ config.fw.bgp_auth_profile }}
+
+# BGP export/import
+set network virtual-router default protocol bgp policy import rules deny-default-ipv4 used-by {{ object_name }}
+set network virtual-router default protocol bgp policy import rules deny-default-ipv6 used-by {{ object_name }}
+
+set network virtual-router default protocol bgp policy import rules allow-all-ipv4 used-by {{ object_name }}
+set network virtual-router default protocol bgp policy import rules allow-all-ipv6 used-by {{ object_name }}
+
+set network virtual-router default protocol bgp policy export rules allow-all-ipv4 used-by {{ object_name }}
+set network virtual-router default protocol bgp policy export rules allow-all-ipv6 used-by {{ object_name }}
+{%- endfor %}
+{%- endfor %}

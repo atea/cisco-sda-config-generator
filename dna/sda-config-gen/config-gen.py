@@ -98,3 +98,5 @@ generate_config(env, 'fusion_iptransit', 'fusion2')
 generate_config(env, 'fusion_fw', 'fusion1', 'fusion2')
 generate_config(env, 'fusion_fw', 'fusion2', 'fusion1')
 
+# generate palo alto fw config for linknets to fusion
+generate_config(env, 'fw', 'fw1')
