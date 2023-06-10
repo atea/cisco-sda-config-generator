@@ -104,13 +104,13 @@ set address linknet_{{ object_name }}_peer_ipv4 ip-netmask {{ macros.get_fw_peer
 set address linknet_{{ object_name }}_peer_ipv6 ip-netmask {{ macros.get_fw_peer_ip(config.fwtransit[peer][vrf].linknet6) }}
 
 # Interface for VRF {{ vrf }} towards {{ peer }}
+set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} tag {{ config.fwtransit[peer][vrf].tag }}
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 neighbor-discovery enable-dad yes
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 neighbor-discovery enable-ndp-monitor yes
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 address linknet_{{ object_name }}_local_ipv6 enable-on-interface yes
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ipv6 enabled yes
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} ip linknet_{{ object_name }}_local_ipv4
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} interface-management-profile {{ config.fw.mgmt_profile }}
-set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} tag {{ config.fwtransit[peer][vrf].tag }}
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} comment "{{ vrf }}; {{ config.fusion[peer].hostname }}"
 set import network interface {{ subinterface_name }}
 set network virtual-router {{ config.fw.vr }} interface {{ subinterface_name }}
