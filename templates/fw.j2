@@ -115,7 +115,7 @@ set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 
 set network interface ethernet {{ config.fw.fw1.interfaces[peer].port }} layer3 units {{ subinterface_name }} comment "{{ vrf }}; {{ config.fusion[peer].hostname }}"
 set import network interface {{ subinterface_name }}
 set network virtual-router {{ config.fw.vr }} interface {{ subinterface_name }}
-set zone mgmt network layer3 {{ subinterface_name }}
+set zone {{ vrf }} network layer3 {{ subinterface_name }}
 
 # BGP for VRF {{ vrf }} towards {{ peer }}
 set network virtual-router {{ config.fw.vr }} protocol bgp peer-group {{ object_name }} type ebgp remove-private-as no
