@@ -17,6 +17,8 @@ The following is assumed;
  * eBGP is used between each layer (i.e. between FS1/FS2 and FEXIT, between FEXIT and FUSION, between FUSION and each TCN, and between FUSION and firewalls)
  * TCN nodes are connected directly to FUSION or FEXIT (can be changed via config)
  * ISIS between border nodes (FEXIT1+2, FS1a+FS1b, FS2a+FS2b, etc), to distribute Lo0 for the automatically configured iBGP between Lo0 interfaces
+ * Assumes /30 or /31 IPv4 linknets, and /126 or /127 IPv6 linknets (larger linknets is untested, but should work; the logic will then pick the two first available IPs for each side of the linknets).
+ * FUSION/FW-interconnection is assumed to be SVI on FUSION side, with two links to active+passive FW (where same IPs are used on FW side during a failover).
  * Device-specific config is properly configured (proper descriptions and similar), while common config only has bare minimum to get the device discoverable and configurable from DNAC. Full and best-practice config pushed via dayN templates from DNAC when provisioning the device (SNMP ACLs, VTY config, etc).
 
 ```
