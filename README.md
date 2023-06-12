@@ -51,8 +51,8 @@ The following is assumed;
  * Profit???
 
 ```
-git clone https://github.com/atea/cisco.git
-cd cisco/dna/sda-config-gen
+git clone https://github.com/atea/cisco-sda-config-generator.git
+cd cisco-sda-config-generator
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
